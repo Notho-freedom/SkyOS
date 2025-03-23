@@ -118,3 +118,46 @@
 .dragging-active {
   cursor: move;
 }
+
+.window-transform {
+  transition: 
+    transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28),
+    opacity 0.2s ease;
+}
+
+.window-transform.maximized {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+.dock-item {
+  transition: 
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.dock-item:hover {
+  transform: scale(1.1) translateY(-10px);
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+}
+
+/* window.css */
+.window-container {
+  transition: 
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease;
+}
+
+.window-container.maximized {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Animation de minimisation */
+.window-container.minimized {
+  transform: translateY(100vh) scale(0.5);
+  opacity: 0;
+  pointer-events: none;
+}

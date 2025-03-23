@@ -1,57 +1,71 @@
 import './window.css';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 
-const Window = ({ children, title, id, active, onFocus }) => {
+const Window = ({ config, onAction, children }) => {
   const rndRef = useRef(null);
-  const [size, setSize] = useState({ width: 400, height: 300 });
-  const [position, setPosition] = useState({ x: window.innerWidth/4, y: 80 });
-  const isDragging = useRef(false);
-  const isMd = size.width > 700 ? "text-sm" : "text-xs";
+  const isMd = config.size.width > 700 ? "text-sm" : "text-xs";
+  const lastPosition = useRef(config.position);
+  const lastSize = useRef(config.size);
 
-  const handleFocus = () => {
-    onFocus?.();
-  };
+  // Mémoisation stable de handleAction
+  const handleAction = useCallback((action) => {
+    onAction(config.id, action);
+  }, [onAction, config.id]);
 
-  // Gestion du redimensionnement
+  // Gestion optimisée du redimensionnement
   const handleResize = useCallback((e, direction, ref, delta, pos) => {
-    setSize({
-      width: parseInt(ref.style.width),
-      height: parseInt(ref.style.height)
-    });
-    setPosition(pos);
+    lastSize.current = { 
+      width: parseInt(ref.style.width), 
+      height: parseInt(ref.style.height) 
+    };
+    lastPosition.current = pos;
+    
+    // Mise à jour visuelle immédiate sans re-render
+    rndRef.current.updateSize(lastSize.current);
+    rndRef.current.updatePosition(lastPosition.current);
   }, []);
 
-  // Gestion du drag
+  // Gestion fluide du drag
   const handleDrag = useCallback((e, data) => {
-    if (!isDragging.current) return;
-    
-    requestAnimationFrame(() => {
-      setPosition({ x: data.x, y: data.y });
-    });
+    lastPosition.current = { x: data.x, y: data.y };
+    rndRef.current.updatePosition(lastPosition.current);
   }, []);
+
+  // Envoi des dernières valeurs au parent quand l'action est terminée
+  const handleDragStop = useCallback(() => {
+    handleAction({
+      type: 'MOVE',
+      position: lastPosition.current
+    });
+    document.body.classList.remove('dragging-active');
+  }, [handleAction]);
+
+  const handleResizeStop = useCallback(() => {
+    handleAction({
+      type: 'RESIZE',
+      size: lastSize.current,
+      position: lastPosition.current
+    });
+  }, [handleAction]);
 
   return (
     <Rnd
       ref={rndRef}
-      size={size}
-      position={position}
+      size={config.size}
+      position={config.position}
       minWidth={300}
       minHeight={200}
       bounds="parent"
+      disableDragging={config.maximized}
       onDragStart={() => {
-        isDragging.current = true;
         document.body.classList.add('dragging-active');
-        handleFocus();
+        handleAction({ type: 'FOCUS' });
       }}
       onDrag={handleDrag}
-      onDragStop={(e, data) => {
-        isDragging.current = false;
-        document.body.classList.remove('dragging-active');
-        setPosition({ x: data.x, y: data.y });
-      }}
+      onDragStop={handleDragStop}
       onResize={handleResize}
-      onMouseDown={handleFocus}
+      onResizeStop={handleResizeStop}
       enableResizing={{
         top: true,
         right: true,
@@ -73,25 +87,35 @@ const Window = ({ children, title, id, active, onFocus }) => {
         topLeft: 'resize-handle top-left'
       }}
       dragHandleClassName="draggable-handle"
-      className="window-container"
-      style={{ zIndex: active ? 100 : 1 }}
+      className={`window-container ${config.maximized ? 'maximized' : ''}`}
+      style={{ 
+        zIndex: config.zIndex,
+        transition: config.maximized ? 'none' : 'opacity 0.2s ease' 
+      }}
     >
       <div 
         className="flex flex-col h-full bg-white bg-opacity-95 rounded-lg shadow-lg overflow-hidden"
-        onMouseDown={handleFocus}
+        onMouseDown={() => handleAction({ type: 'FOCUS' })}
       >
-        {/* Barre de titre */}
         <div className="draggable-handle flex items-center justify-between bg-gray-200 px-4 py-2 cursor-move">
           <div className="flex space-x-2">
-            <button className="w-3 h-3 bg-red-500 rounded-full hover:bg-red-600"/>
-            <button className="w-3 h-3 bg-yellow-500 rounded-full hover:bg-yellow-600"/>
-            <button className="w-3 h-3 bg-green-500 rounded-full hover:bg-green-600"/>
+            <button 
+              onClick={() => handleAction({ type: 'MINIMIZE' })}
+              className="w-3 h-3 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
+            />
+            <button
+              onClick={() => handleAction({ type: 'MAXIMIZE' })}
+              className="w-3 h-3 bg-yellow-500 rounded-full hover:bg-yellow-600 transition-colors"
+            />
+            <button
+              onClick={() => handleAction({ type: 'CLOSE' })}
+              className="w-3 h-3 bg-green-500 rounded-full hover:bg-green-600 transition-colors"
+            />
           </div>
-          <span className={`${isMd} text-gray-700 truncate px-3`}>{title}</span>
-          <div className="w-3 h-3"/>
+          <span className={`${isMd} text-gray-700 truncate px-3`}>{config.url}</span>
+          <div className="w-3 h-3" />
         </div>
-
-        {/* Contenu */}
+        
         <div className="w-full h-full">
           {children}
         </div>
