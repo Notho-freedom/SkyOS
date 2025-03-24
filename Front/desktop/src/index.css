@@ -12,3 +12,17 @@ code {
     monospace;
 }
 
+.react-contextmenu {
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.react-contextmenu--visible {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.react-contextmenu--hidden {
+  pointer-events: none;
+  opacity: 0;
+}
