@@ -1,0 +1,70 @@
+{
+    "menu": {
+      "Apple": "Apple",
+      "About This Mac": "À propos de ce Mac",
+      "System Settings": "Réglages du système...",
+      "App Store": "App Store...",
+      "Recent Items": "Éléments récents",
+      "Force Quit": "Forcer à quitter...",
+      "Sleep": "Suspendre",
+      "Restart": "Redémarrer...",
+      "Shut Down": "Éteindre...",
+      "Lock Screen": "Verrouiller l’écran",
+      "Log Out": "Se déconnecter...",
+  
+      "Finder": "Finder",
+      "New Finder Window": "Nouvelle fenêtre Finder",
+      "New Folder": "Nouveau dossier",
+      "New Smart Folder": "Nouveau dossier intelligent",
+      "Find": "Rechercher",
+      "Empty Trash": "Vider la corbeille...",
+  
+      "File": "Fichier",
+      "New": "Nouveau",
+      "Open": "Ouvrir...",
+      "Open Recent": "Ouvrir un récent",
+      "Close Window": "Fermer la fenêtre",
+      "Save": "Enregistrer",
+      "Save As": "Enregistrer sous...",
+      "Print": "Imprimer...",
+  
+      "Edit": "Édition",
+      "Undo": "Annuler",
+      "Redo": "Rétablir",
+      "Cut": "Couper",
+      "Copy": "Copier",
+      "Paste": "Coller",
+      "Select All": "Tout sélectionner",
+  
+      "View": "Affichage",
+      "as Icons": "comme Icônes",
+      "as List": "comme Liste",
+      "as Columns": "comme Colonnes",
+      "as Gallery": "comme Galerie",
+      "Show Hidden Files": "Afficher les fichiers cachés",
+      "Show Path Bar": "Afficher la barre de chemin",
+      "Show Status Bar": "Afficher la barre d’état",
+  
+      "Go": "Aller",
+      "Back": "Retour",
+      "Forward": "Avancer",
+      "Computer": "Ordinateur",
+      "Home": "Accueil",
+      "Documents": "Documents",
+      "Downloads": "Téléchargements",
+      "Applications": "Applications",
+      "Utilities": "Utilitaires",
+  
+      "Window": "Fenêtre",
+      "Minimize": "Réduire",
+      "Zoom": "Agrandir",
+      "Tile Window to Left of Screen": "Placer la fenêtre à gauche de l’écran",
+      "Tile Window to Right of Screen": "Placer la fenêtre à droite de l’écran",
+      "Bring All to Front": "Tout ramener au premier plan",
+  
+      "Help": "Aide",
+      "Search": "Rechercher",
+      "macOS Help": "Aide macOS"
+    }
+  }
+  

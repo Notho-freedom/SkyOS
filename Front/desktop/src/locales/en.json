@@ -1,0 +1,70 @@
+{
+    "menu": {
+      "Apple": "Apple",
+      "About This Mac": "About This Mac",
+      "System Settings": "System Settings...",
+      "App Store": "App Store...",
+      "Recent Items": "Recent Items",
+      "Force Quit": "Force Quit...",
+      "Sleep": "Sleep",
+      "Restart": "Restart...",
+      "Shut Down": "Shut Down...",
+      "Lock Screen": "Lock Screen",
+      "Log Out": "Log Out...",
+  
+      "Finder": "Finder",
+      "New Finder Window": "New Finder Window",
+      "New Folder": "New Folder",
+      "New Smart Folder": "New Smart Folder",
+      "Find": "Find",
+      "Empty Trash": "Empty Trash...",
+  
+      "File": "File",
+      "New": "New",
+      "Open": "Open...",
+      "Open Recent": "Open Recent",
+      "Close Window": "Close Window",
+      "Save": "Save",
+      "Save As": "Save As...",
+      "Print": "Print...",
+  
+      "Edit": "Edit",
+      "Undo": "Undo",
+      "Redo": "Redo",
+      "Cut": "Cut",
+      "Copy": "Copy",
+      "Paste": "Paste",
+      "Select All": "Select All",
+  
+      "View": "View",
+      "as Icons": "as Icons",
+      "as List": "as List",
+      "as Columns": "as Columns",
+      "as Gallery": "as Gallery",
+      "Show Hidden Files": "Show Hidden Files",
+      "Show Path Bar": "Show Path Bar",
+      "Show Status Bar": "Show Status Bar",
+  
+      "Go": "Go",
+      "Back": "Back",
+      "Forward": "Forward",
+      "Computer": "Computer",
+      "Home": "Home",
+      "Documents": "Documents",
+      "Downloads": "Downloads",
+      "Applications": "Applications",
+      "Utilities": "Utilities",
+  
+      "Window": "Window",
+      "Minimize": "Minimize",
+      "Zoom": "Zoom",
+      "Tile Window to Left of Screen": "Tile Window to Left of Screen",
+      "Tile Window to Right of Screen": "Tile Window to Right of Screen",
+      "Bring All to Front": "Bring All to Front",
+  
+      "Help": "Help",
+      "Search": "Search",
+      "macOS Help": "macOS Help"
+    }
+  }
+  
