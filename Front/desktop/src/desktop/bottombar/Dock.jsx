@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, memo } from "react"
+import { useState } from "react"
 import {
   FaFolderOpen ,
   FaSafari,
