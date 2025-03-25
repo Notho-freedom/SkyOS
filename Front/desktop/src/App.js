@@ -8,22 +8,29 @@ import Dock from './desktop/bottombar/Dock';
 import { useTranslation } from "react-i18next";
 import DesktopManager from './desktop/mainscreem/DesktopManager';
 import WindowManager from './desktop/window/WindowManager';
+import { ThemeProvider } from "./theme/ThemeContext"
+import { ContextMenuProvider } from "./desktop/contextual_menu/ContextMenuContext";
 
 const App = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(); 
+
   return (
     <AppProvider>
-      <AppInitializer>
-        <Suspense fallback={<div>{t("loading..")}</div>}>
-          <DesktopBackground>
-            <TopBar />
-            <Dock />
-            <DesktopManager />
-            <WindowManager />
-          </DesktopBackground>
-        </Suspense>
-      </AppInitializer>
-    </AppProvider>
+      <ThemeProvider>
+        <ContextMenuProvider>
+          <AppInitializer>
+            <Suspense fallback={<div>{t("loading")}</div>}>
+              <DesktopBackground>
+                <TopBar />
+                <Dock />
+                <DesktopManager />
+                <WindowManager />
+              </DesktopBackground>
+            </Suspense>
+          </AppInitializer>
+        </ContextMenuProvider>
+      </ThemeProvider>
+  </AppProvider>
   );
 };
 
