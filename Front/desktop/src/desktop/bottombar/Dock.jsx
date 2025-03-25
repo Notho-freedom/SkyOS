@@ -2,6 +2,7 @@
 
 import { useState, memo } from "react"
 import { useTheme } from "./../../theme/ThemeContext"
+
 import {
   FaFolderOpen,
   FaSafari,
