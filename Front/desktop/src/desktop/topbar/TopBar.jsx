@@ -4,15 +4,18 @@ import { useState, useRef, useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { 
   FaApple, FaWifi, FaBluetooth, FaVolumeUp, FaBatteryFull, 
-  FaSearch, FaPlay, FaForward, FaBackward, FaPause
+  FaSearch, FaPlay, FaForward, FaBackward, FaPause,
+  FaMoon, FaSun
 } from "react-icons/fa"
 import { 
   MdAirplanemodeActive, MdBrightnessMedium, 
   MdKeyboard, MdCast
 } from "react-icons/md"
+import { useTheme } from "./../../theme/ThemeContext"
 
 const TopBar = () => {
   const { t } = useTranslation()
+  const { theme, toggleDarkMode } = useTheme()
   const [activeMenu, setActiveMenu] = useState(null)
   const [controlCenterOpen, setControlCenterOpen] = useState(false)
   const [currentTime, setCurrentTime] = useState("")
@@ -71,26 +74,13 @@ const TopBar = () => {
   }
 
   // Control Center functions
-  const toggleWifi = () => {
-    setWifiEnabled(!wifiEnabled)
-    console.log(`Wi-Fi ${wifiEnabled ? "disabled" : "enabled"}`)
-  }
-
-  const toggleBluetooth = () => {
-    setBluetoothEnabled(!bluetoothEnabled)
-    console.log(`Bluetooth ${bluetoothEnabled ? "disabled" : "enabled"}`)
-  }
-
+  const toggleWifi = () => setWifiEnabled(!wifiEnabled)
+  const toggleBluetooth = () => setBluetoothEnabled(!bluetoothEnabled)
   const cycleAirDropMode = () => {
     const modes = ["Off", "Contacts Only", "Everyone"]
     setAirDropMode(modes[(modes.indexOf(airDropMode) + 1) % modes.length])
   }
-
-  const adjustSetting = (setting, value) => {
-    const newValue = Math.min(100, Math.max(0, setting + value))
-    return newValue
-  }
-
+  const adjustSetting = (setting, value) => Math.min(100, Math.max(0, setting + value))
   const togglePlayPause = () => setIsPlaying(!isPlaying)
   const toggleAirPlay = () => setAirPlaySearching(!airPlaySearching)
 
@@ -185,7 +175,12 @@ const TopBar = () => {
   ], [t])
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-7 bg-gradient-to-r from-blue-600 to-purple-600 flex justify-between items-center px-2 text-xs font-medium z-50 text-white">
+    <div 
+      className="fixed top-0 left-0 right-0 h-7 flex justify-between items-center px-2 text-xs font-medium z-50 text-white"
+      style={{
+        background: `linear-gradient(to right, ${theme.colors.primary}, ${theme.colors.secondary})`
+      }}
+    >
       {/* Left side - Menu items */}
       <div className="flex items-center space-x-4">
         {menuItems.map((menu) => (
@@ -221,6 +216,19 @@ const TopBar = () => {
 
       {/* Right side - Status icons and Control Center */}
       <div className="flex items-center space-x-3">
+        {/* Theme toggle button */}
+        <button 
+          onClick={toggleDarkMode}
+          className="p-1 rounded-full hover:bg-white hover:bg-opacity-20"
+          aria-label="Toggle dark mode"
+        >
+          {theme.name === "dark" ? (
+            <FaSun className="h-3 w-3" />
+          ) : (
+            <FaMoon className="h-3 w-3" />
+          )}
+        </button>
+
         <div className="relative" ref={controlCenterRef}>
           <button 
             onClick={toggleControlCenter}
@@ -239,7 +247,10 @@ const TopBar = () => {
           
           {/* Control Center Dropdown */}
           {controlCenterOpen && (
-            <div className="absolute right-0 top-full mt-1 bg-gray-200 bg-opacity-80 backdrop-blur-md rounded-lg shadow-xl w-72 p-3 z-50 text-black">
+            <div 
+              className="absolute right-0 top-full mt-1 bg-gray-200 bg-opacity-80 backdrop-blur-md rounded-lg shadow-xl w-72 p-3 z-50 text-black"
+              style={{ backgroundColor: theme.colors.background, color: theme.colors.text }}
+            >
               <div className="grid grid-cols-2 gap-2">
                 {/* First row */}
                 <button 
