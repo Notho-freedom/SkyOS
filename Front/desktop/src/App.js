@@ -1,4 +1,5 @@
 // App.jsx
+import { WebAppProvider } from './Apps/AppManager';
 import React, {Suspense }  from 'react';
 import {useApp } from './desktop/AppContext';
 import DesktopBackground from './desktop/mainscreem/DesktopBackground';
@@ -9,7 +10,7 @@ import DesktopManager from './desktop/mainscreem/DesktopManager';
 import WindowManager from './desktop/window/WindowManager';
 import { ThemeProvider } from "./theme/ThemeContext"
 import { ContextMenuProvider } from "./desktop/contextual_menu/ContextMenuContext";
-import { WebAppProvider } from './Apps/AppManager';
+
 
 const App = () => {
   const { t } = useTranslation();

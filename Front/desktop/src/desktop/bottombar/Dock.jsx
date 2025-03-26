@@ -15,7 +15,7 @@ const Dock = () => {
 
   useEffect(() => {
     batchAddApps(AppList);
-  }, [])
+  }, [batchAddApps])
 
   const handleResize = useCallback(() => {
     const viewportWidth = window.innerWidth/2;

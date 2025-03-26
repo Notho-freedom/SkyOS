@@ -1,4 +1,6 @@
 const { app, BrowserWindow} = require("electron");
+const path = require('path');
+require('../../node/server.js');
 
 let mainWindow;
 
@@ -8,6 +10,7 @@ app.whenReady().then(() => {
     height: 800,
     frame: true,
     webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
       webSecurity: false,
       allowRunningInsecureContent: true,
       nodeIntegration: true,
@@ -16,7 +19,7 @@ app.whenReady().then(() => {
     },
   });
 
-  mainWindow.loadURL("http://localhost:3001");
+  mainWindow.loadURL("http://localhost:3000");
   mainWindow.setMenu(null);
 });
 

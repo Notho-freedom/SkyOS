@@ -1,29 +1,46 @@
 // WebAppProvider.jsx
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 
 const WebAppContext = createContext();
 
-export const WebAppProvider = ({ children }) => {
-  const [apps, setApps] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+const initialState = {
+  apps: [],
+  loading: false,
+  error: null,
+};
 
-  // Chargement initial depuis localStorage
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_APPS':
+      return { ...state, apps: action.payload };
+    case 'ADD_APP':
+      return { ...state, apps: [...state.apps, action.payload] };
+    case 'REMOVE_APP':
+      return { ...state, apps: state.apps.filter(app => app.id !== action.payload) };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload };
+    default:
+      return state;
+  }
+}
+
+export const WebAppProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { apps, loading, error } = state;
+
   useEffect(() => {
-    const loadApps = async () => {
-      try {
-        const storedApps = localStorage.getItem('webapps');
-        if (storedApps) {
-          setApps(JSON.parse(storedApps));
-        }
-      } catch (err) {
-        setError('Erreur de chargement des applications');
+    try {
+      const storedApps = localStorage.getItem('webapps');
+      if (storedApps) {
+        dispatch({ type: 'SET_APPS', payload: JSON.parse(storedApps) });
       }
-    };
-    loadApps();
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', payload: 'Erreur de chargement des applications' });
+    }
   }, []);
 
-  // Sauvegarde automatique dans localStorage
   useEffect(() => {
     localStorage.setItem('webapps', JSON.stringify(apps));
   }, [apps]);
@@ -33,63 +50,31 @@ export const WebAppProvider = ({ children }) => {
     const data = encoder.encode(url);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     return Array.from(new Uint8Array(hashBuffer))
-      .map(b => b.toString(16).padStart(2, '0')).join('');
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
   }, []);
 
+  // Récupération des métadonnées via l'API backend
   const fetchAppMetadata = useCallback(async (url) => {
     try {
-      const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
-      const html = await response.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      
-      return {
-        title: doc.title,
-        favicon: (() => {
-          const icons = Array.from(doc.querySelectorAll('link[rel*="icon"]')).sort((a, b) => {
-            const aSize = parseInt(a.getAttribute('sizes')?.split('x')[0]) || 0;
-            const bSize = parseInt(b.getAttribute('sizes')?.split('x')[0]) || 0;
-            return bSize - aSize;
-          });
-      
-          if (icons.length > 0) {
-            return icons[0]?.href;
-          }
-      
-          const domainFavicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`;
-      
-          if (domainFavicon) {
-            return domainFavicon;
-          }
-      
-          // Liste d'icônes aléatoires du web
-          const randomFavicons = [
-            "https://upload.wikimedia.org/wikipedia/commons/a/a3/Favicon.ico",
-            "https://www.mozilla.org/media/img/favicons/firefox/browser/favicon.7e02976505d6.ico",
-            "https://github.githubassets.com/favicons/favicon.png",
-            "https://www.w3.org/favicon.ico",
-            "https://developer.mozilla.org/favicon-48x48.cbbd161b.png"
-          ];
-      
-          return randomFavicons[Math.floor(Math.random() * randomFavicons.length)];
-        })()
-      };
-
+      const response = await fetch(`/fetchMetadata?url=${encodeURIComponent(url)}`);
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des métadonnées');
+      }
+      return await response.json();
     } catch (err) {
       return { title: null, favicon: null };
     }
   }, []);
 
   const addApp = useCallback(async (url) => {
-    setLoading(true);
+    dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const existingApp = apps.find(app => app.url === url);
-      if (existingApp) {
-        return ;
-      }
+      if (apps.some(app => app.url === url)) return; // éviter les doublons
 
       const id = await createAppId(url);
       const { title, favicon } = await fetchAppMetadata(url);
+      if (!title && !favicon) throw new Error('Impossible de récupérer les métadonnées de l\'application');
 
       const newApp = {
         id,
@@ -99,28 +84,28 @@ export const WebAppProvider = ({ children }) => {
         createdAt: new Date().toISOString()
       };
 
-      setApps(prev => [...prev, newApp]);
+      dispatch({ type: 'ADD_APP', payload: newApp });
       return newApp;
     } catch (err) {
-      setError(err.message);
+      dispatch({ type: 'SET_ERROR', payload: err.message });
       throw err;
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, [apps, createAppId, fetchAppMetadata]);
 
   const batchAddApps = useCallback(async (urls) => {
-    setLoading(true);
+    dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const results = await Promise.allSettled(urls.map(url => addApp(url)));
       return results;
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, [addApp]);
 
   const removeApp = useCallback((id) => {
-    setApps(prev => prev.filter(app => app.id !== id));
+    dispatch({ type: 'REMOVE_APP', payload: id });
   }, []);
 
   return (
