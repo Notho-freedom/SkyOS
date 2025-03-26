@@ -1,11 +1,12 @@
 // AppContext.jsx
-import React, { createContext, useContext, useCallback, useState } from 'react';
+import React, { createContext, useRef, useContext, useCallback, useState } from 'react';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [windows, setWindows] = useState([]);
   const [desktopIcons, setDesktopIcons] = useState([]);
+  const bgRef = useRef();
   
   const fetchAppData = async (url) => {
     try {
@@ -247,6 +248,8 @@ export const AppProvider = ({ children }) => {
         handleWindowAction,
         handleIconAction,
         fetchAppData,
+        setWindows,
+        bgRef,
       }}
     >
       {children}

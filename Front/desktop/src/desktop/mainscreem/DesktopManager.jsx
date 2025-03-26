@@ -4,7 +4,7 @@ import { useApp } from './../AppContext';
 import { useContextMenu } from "../contextual_menu/ContextMenuContext";
 
 const DesktopManager = () => {
-  const { desktopIcons, handleIconAction, createNewFolder } = useApp();
+  const { desktopIcons, handleIconAction, createNewFolder, bgRef } = useApp();
   const { showContextMenu } = useContextMenu();
   const desktopRef = useRef(null);
   const [desktopBounds, setDesktopBounds] = useState({
@@ -45,7 +45,7 @@ const DesktopManager = () => {
         action: () => createNewFolder("Nouveau dossier", { x: e.clientX, y: e.clientY })
       },
       { separator: true },
-      { label: "Actualiser le bureau", action: () => window.location.reload() },
+      { label: "Actualiser le bureau", action: () => bgRef.current?.refreshBackground() },
       { separator: true },
       { 
         label: "Affichage", 

@@ -1,7 +1,6 @@
 // App.jsx
 import React, {Suspense }  from 'react';
-import { AppProvider } from './desktop/AppContext';
-import AppInitializer from './desktop/AppInitializer';
+import {useApp } from './desktop/AppContext';
 import DesktopBackground from './desktop/mainscreem/DesktopBackground';
 import TopBar from './desktop/topbar/TopBar';
 import Dock from './desktop/bottombar/Dock';
@@ -10,27 +9,27 @@ import DesktopManager from './desktop/mainscreem/DesktopManager';
 import WindowManager from './desktop/window/WindowManager';
 import { ThemeProvider } from "./theme/ThemeContext"
 import { ContextMenuProvider } from "./desktop/contextual_menu/ContextMenuContext";
+import { WebAppProvider } from './Apps/AppManager';
 
 const App = () => {
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
+  const { bgRef } = useApp();
 
   return (
-    <AppProvider>
+<WebAppProvider>
       <ThemeProvider>
         <ContextMenuProvider>
-          <AppInitializer>
             <Suspense fallback={<div>{t("loading")}</div>}>
-              <DesktopBackground>
+              <DesktopBackground ref={bgRef}>
                 <TopBar />
                 <Dock />
                 <DesktopManager />
                 <WindowManager />
               </DesktopBackground>
             </Suspense>
-          </AppInitializer>
         </ContextMenuProvider>
       </ThemeProvider>
-  </AppProvider>
+</WebAppProvider>
   );
 };
 

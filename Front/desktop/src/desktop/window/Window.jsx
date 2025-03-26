@@ -90,7 +90,8 @@ const Window = ({ config, onAction, children }) => {
       className={`window-container ${config.maximized ? 'maximized' : ''}`}
       style={{ 
         zIndex: config.zIndex,
-        transition: config.maximized ? 'none' : 'opacity 0.2s ease' 
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        willChange: 'transform, width, height'
       }}
     >
       <div 
