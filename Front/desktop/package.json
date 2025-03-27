@@ -48,7 +48,6 @@
     "webpack-dev-server": "^5.2.0"
   },
   "main": "public/Electron/electron.js",
-  "proxy": "http://localhost:3001",
   "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
