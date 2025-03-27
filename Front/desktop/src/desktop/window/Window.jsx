@@ -2,7 +2,7 @@ import './window.css';
 import React, { useCallback, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 
-const Window = ({ config, onAction, children }) => {
+const Window = ({ config={}, onAction, children }) => {
   const rndRef = useRef(null);
   const isMd = config.size.width > 700 ? "text-sm" : "text-xs";
   const lastPosition = useRef(config.position);

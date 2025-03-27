@@ -1,4 +1,3 @@
-// src/desktop/contextmenu/ContextMenuWidget.js
 "use client"
 
 import { useEffect, useRef, useState } from "react"
@@ -29,8 +28,6 @@ const ContextMenuWidget = ({ items, position, onClose }) => {
         x: rect.right + 5,
         y: rect.top
       })
-    } else {
-      setSubMenu(null)
     }
   }
 
@@ -38,6 +35,10 @@ const ContextMenuWidget = ({ items, position, onClose }) => {
     if (item.action && !item.submenu) {
       item.action()
       onClose()
+    }
+    // Si un sous-menu est visible, il reste ouvert jusqu'à ce que l'utilisateur clique sur un élément
+    if (!item.submenu) {
+      setSubMenu(null)  // Ferme le sous-menu seulement si l'utilisateur clique sur un élément sans sous-menu
     }
   }
 
@@ -112,7 +113,6 @@ const ContextMenuWidget = ({ items, position, onClose }) => {
             left: `${subMenuPosition.x}px`,
             top: `${subMenuPosition.y}px`,
           }}
-          onMouseLeave={() => setSubMenu(null)}
         >
           {renderItems(subMenu)}
         </div>

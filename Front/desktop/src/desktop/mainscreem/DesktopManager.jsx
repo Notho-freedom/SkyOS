@@ -38,36 +38,81 @@ const DesktopManager = () => {
 
   const handleDesktopContextMenu = useCallback((e) => {
     e.preventDefault();
-
+  
     const menuItems = [
       { 
         label: "Nouveau dossier", 
         action: () => createNewFolder("Nouveau dossier", { x: e.clientX, y: e.clientY })
       },
       { separator: true },
-      { label: "Actualiser le bureau", action: () => bgRef.current?.refreshBackground() },
+      { label: "Changer le fond d'écran", action: () => bgRef.current?.refreshBackground() },
+      { separator: true },
+      { label: "Enregistrer le fond d'écran", action: () => bgRef.current?.saveCurrentBackground() },
       { separator: true },
       { 
-        label: "Affichage", 
+        label: "Applications", 
         submenu: [
-          { label: "Trier par nom", action: () => sortIcons('name') },
-          { label: "Trier par date", action: () => sortIcons('date') },
-          { label: "Trier par type", action: () => sortIcons('type') },
+          { label: "Lancer une application" },
+          { label: "Ouvrir dans une fenêtre flottante" },
+          { label: "Organiser les applications ouvertes" },
           { separator: true },
-          { label: "Nettoyer" }
+          { label: "Afficher dans un autre bureau virtuel" }
         ] 
       },
       { 
-        label: "Options", 
+        label: "Fichiers", 
         submenu: [
-          { label: "Paramètres d'affichage" },
-          { label: "Personnaliser" }
+          { label: "Déplacer vers le cloud" },
+          { label: "Synchroniser avec un autre appareil" },
+          { label: "Vérifier l'intégrité des fichiers" },
+          { separator: true },
+          { label: "Partager avec le réseau SkyOS" }
+        ] 
+      },
+      { separator: true },
+      { 
+        label: "Personnalisation", 
+        submenu: [
+          { label: "Changer le thème" },
+          { label: "Personnaliser la barre de tâches" },
+          { label: "Organiser les icônes automatiquement" },
+          { label: "Afficher la météo" },
+          { label: "Afficher le calendrier" }
+        ] 
+      },
+      { separator: true },
+      { 
+        label: "Sécurité et Sauvegarde", 
+        submenu: [
+          { label: "Activer la sauvegarde automatique" },
+          { label: "Restaurer le bureau" },
+          { separator: true },
+          { label: "Protéger avec un mot de passe" }
+        ] 
+      },
+      { separator: true },
+      { 
+        label: "Cloud", 
+        submenu: [
+          { label: "Accéder aux fichiers du cloud" },
+          { label: "Synchroniser avec un autre compte" },
+          { label: "Envoyer des fichiers vers le cloud" }
+        ] 
+      },
+      { separator: true },
+      { 
+        label: "Paramètres avancés", 
+        submenu: [
+          { label: "Activer le mode développeur" },
+          { label: "Accéder aux logs du système" },
+          { label: "Moniteur des ressources" }
         ] 
       }
     ];
-
+  
     showContextMenu(menuItems, { x: e.clientX, y: e.clientY });
   }, [createNewFolder, showContextMenu]);
+  
 
   const handleIconContextMenu = useCallback((e, icon) => {
     e.preventDefault();

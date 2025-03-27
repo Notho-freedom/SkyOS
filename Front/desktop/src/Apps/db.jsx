@@ -29,6 +29,11 @@ class WebAppDB extends Dexie {
     const app = await this.apps.get({ url });
     return app !== undefined;
   }
+
+  // Vider complètement la base de données
+  async clearDB() {
+    await this.apps.clear();
+  }
 }
 
 // Créer une instance de la base de données

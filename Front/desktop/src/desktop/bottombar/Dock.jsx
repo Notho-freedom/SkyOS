@@ -4,71 +4,76 @@ import { memo, useEffect, useCallback, useRef, useState } from "react";
 import { useTheme } from "./../../theme/ThemeContext";
 import { useWebApps } from "../../Apps/AppManager";
 import { useApp } from "../AppContext";
-import AppList from './../../Apps/AppInit'; // Assure-toi que AppList est un tableau d'URLs à ajouter
+import AppList from './../../Apps/AppInit';
 
 const Dock = () => {
   const { theme } = useTheme();
   const { batchAddApps, apps, loading, error } = useWebApps();
   const { setWindows, windows } = useApp();
-  // On initialise visibleAppsCount à apps.length par défaut si apps est non vide
   const [visibleAppsCount, setVisibleAppsCount] = useState(apps.length);
   const dockRef = useRef(null);
+  const resizeFrame = useRef(null);
 
-  // Debug : Affiche les apps dans la console
-  useEffect(() => {
-    console.log("Apps chargées:", apps);
-    // Met à jour visibleAppsCount dès que les apps sont chargées
-    setVisibleAppsCount(apps.length);
-  }, [apps]);
-
-  // Si AppList est un tableau d'URLs à ajouter, tu peux décommenter la ligne suivante :
   useEffect(() => {
     batchAddApps(AppList);
   }, [batchAddApps]);
 
-  // Calcul du nombre d'apps visibles en fonction de la taille de l'écran
   const handleResize = useCallback(() => {
-    if (!dockRef.current) return;
-
-    const viewportWidth = window.innerWidth / 2;
-    const paddingX = 32; // px-4 (16px * 2)
-    const gap = 8; // gap-2 (8px)
-    const appItems = dockRef.current.querySelectorAll('.app-item');
-
-    // Log pour déboguer la largeur et le nombre d'apps rendus
-    console.log("Nombre d'appItems rendus:", appItems.length);
-
-    if (!appItems.length) {
-      // Si aucun élément n'est encore rendu, on peut afficher toutes les apps
-      setVisibleAppsCount(apps.length);
-      return;
+    if (resizeFrame.current) {
+      cancelAnimationFrame(resizeFrame.current);
     }
 
-    const appItemWidth = appItems[0].offsetWidth;
-    const maxWidth = viewportWidth - paddingX;
-    const availableWidthPerApp = appItemWidth + gap;
+    resizeFrame.current = requestAnimationFrame(() => {
+      if (!dockRef.current) return;
 
-    let maxN = Math.floor((maxWidth + gap) / availableWidthPerApp);
-    maxN = Math.max(1, Math.min(apps.length, maxN));
+      const viewportWidth = window.innerWidth / 2;
+      const paddingX = 32;
+      const gap = 8;
+      const appItems = dockRef.current.querySelectorAll('.app-item');
 
-    console.log("Nombre maximum d'apps affichées:", maxN);
-    setVisibleAppsCount(maxN);
+      if (!appItems.length) {
+        setVisibleAppsCount(apps.length);
+        return;
+      }
+
+      const appItemWidth = appItems[0].offsetWidth;
+      const maxWidth = viewportWidth - paddingX;
+      const availableWidthPerApp = appItemWidth + gap;
+
+      let maxN = Math.floor((maxWidth + gap) / availableWidthPerApp);
+      maxN = Math.max(1, Math.min(apps.length, maxN));
+
+      setVisibleAppsCount(maxN);
+    });
   }, [apps.length]);
 
   useEffect(() => {
     handleResize();
+
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleResize);
+
+    const observer = new MutationObserver(handleResize);
+    if (dockRef.current) {
+      observer.observe(dockRef.current, { childList: true, subtree: true });
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleResize);
+      observer.disconnect();
+      if (resizeFrame.current) {
+        cancelAnimationFrame(resizeFrame.current);
+      }
+    };
   }, [handleResize]);
 
-  // Réexécute le resize quand apps changent
   useEffect(() => {
     handleResize();
   }, [apps, handleResize]);
 
   return (
     <div className="relative">
-      {/* En cas d'erreur, afficher un message en overlay */}
       {error && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="px-4 py-2 bg-red-600 text-white text-sm rounded-md">
@@ -90,11 +95,10 @@ const Dock = () => {
             <div className="w-6 h-6 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
           </div>
         ) : (
-          // Utiliser app.id comme clé pour une stabilité optimale
           apps.slice(0, visibleAppsCount).map((app) => (
             <div
               key={app.id}
-              className="app-item relative flex flex-col items-center group cursor-pointer"
+              className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[48px]"
               onClick={() =>
                 setWindows([
                   ...windows,
