@@ -6,42 +6,48 @@ const { JSDOM } = require('jsdom');
 
 const app = express();
 app.use(cors());
-const PORT = 3001;
+
+const PORT = 8000;
 
 app.get('/fetchMetadata', async (req, res) => {
   const { url } = req.query;
   if (!url) {
     return res.status(400).json({ error: 'URL param missing' });
   }
-  
+
   try {
-    // Import dynamique de node-fetch
-    const { default: fetch } = await import('node-fetch');
-    const response = await fetch(url);
+    const fetch = (await import('node-fetch')).default; // Importation dynamique
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
+      }
+    });
+
     if (!response.ok) {
-      return res.status(500).json({ error: 'Erreur lors du fetch de l’URL' });
+      throw new Error(`Fetch error: ${response.status} ${response.statusText}`);
     }
 
     const html = await response.text();
     const dom = new JSDOM(html);
     const doc = dom.window.document;
-    const title = doc.querySelector('title')?.textContent || '';
 
+    const title = doc.querySelector('title')?.textContent || 'No Title';
+    
     let favicon = '';
     const iconLink = doc.querySelector('link[rel*="icon"]');
     if (iconLink) {
-      favicon = iconLink.href;
+      favicon = new URL(iconLink.href, url).href;
     } else {
       favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`;
     }
 
     return res.json({ title, favicon });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: err.message });
+    console.error('Erreur serveur:', err.message);
+    return res.status(500).json({ error: 'Impossible de récupérer les métadonnées' });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, 'localhost', () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

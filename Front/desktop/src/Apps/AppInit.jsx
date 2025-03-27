@@ -5,26 +5,39 @@ const AppList = [
   "https://www.docker.com/",
   "https://www.terraform.io/",
   "https://sentry.io/",
+  "https://gitlab.com/",
+  "https://www.jetbrains.com/",
+  "https://www.postman.com/",
+  "https://circleci.com/",
+  "https://www.codesandbox.io/",
+  "https://stackblitz.com/",
 
   // Communication
   "https://slack.com/",
   "https://zoom.us/",
   "https://www.skype.com/",
+  "https://discord.com/",
+  "https://microsoftteams.com/",
 
   // Design et Productivité
   "https://www.figma.com/",
   "https://www.google.com/",
+  "https://www.adobe.com/",
+  "https://www.miro.com/",
+  "https://notion.so/",
+  "https://www.trello.com/",
+  "https://www.wrike.com/",
 
   // Divertissement & Multimédia
   "https://www.youtube.com/",
   "https://open.spotify.com/",
   "https://www.twitch.tv/",
-  "https://www.netflix.com/", // (nécessite un compte)
-  "https://www.disneyplus.com/", // (nécessite un compte)
-  "https://soundcloud.com/",
-  "https://www.deezer.com/",
-  "https://letterboxd.com/", // Suivi et critique de films
-  "https://www.imdb.com/", // Base de données de films et séries
+  "https://www.netflix.com/",
+  "https://www.disneyplus.com/",
+  "https://www.hulu.com/",
+  "https://www.amazon.com/Prime-Video/",
+  "https://www.pandora.com/",
+  "https://www.vimeo.com/",
 
   // Réseaux sociaux & autres
   "https://twitter.com/",
@@ -32,7 +45,16 @@ const AppList = [
   "https://www.instagram.com/",
   "https://www.linkedin.com/",
   "https://www.tiktok.com/",
-  "https://www.facebook.com/",
+  "https://www.pinterest.com/",
+  "https://www.snapchat.com/",
+  "https://www.quora.com/",
+  "https://www.medium.com/",
+  "https://www.tumblr.com/",
+
+  // Autres outils utiles
+  "https://www.weather.com/",
+  "https://www.wolframalpha.com/",
+  "https://www.zapier.com/",
 ];
 
 export default AppList;

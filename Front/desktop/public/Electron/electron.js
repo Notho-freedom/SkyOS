@@ -1,6 +1,6 @@
 const { app, BrowserWindow} = require("electron");
 const path = require('path');
-require('../../node/server.js');
+//require('../../node/server.js');
 
 let mainWindow;
 
