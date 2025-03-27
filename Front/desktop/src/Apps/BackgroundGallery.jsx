@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import db from './../desktop/mainscreem/db/BackgroundDB';  // Importer la base de données Dexie
+import db from './../desktop/mainscreem/db/backgroundsDb';  // Importer la base de données Dexie
 import Window from '../desktop/window/Window';
 
 const BackgroundGallery = () => {
@@ -38,9 +38,8 @@ const BackgroundGallery = () => {
               <div className="absolute top-2 right-2">
                 <button 
                   onClick={() => handleDelete(bg.id)}
-                  className="bg-red-500 text-white p-2 rounded-full hover:bg-red-700"
+                  className="bg-red-500 text-white p-2 rounded-full hover:bg-red-700 w-2 h-2 text-xs"
                 >
-                  X
                 </button>
               </div>
             </div>

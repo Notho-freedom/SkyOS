@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Window from './Window';
 
-const WebViewWindow = ({ config, onAction, designWidth = 1280 }) => {
+const WebViewWindow = ({ config, designWidth = 1280 }) => {
   const webviewRef = useRef(null);
   const containerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,7 +16,7 @@ const WebViewWindow = ({ config, onAction, designWidth = 1280 }) => {
         webview.removeEventListener('did-finish-load', handleDidFinishLoad);
       };
     }
-  }, [webviewRef]);
+  }, []);
 
   // Fonction d'ajustement du zoom
   const adjustZoom = () => {
@@ -47,8 +47,9 @@ const WebViewWindow = ({ config, onAction, designWidth = 1280 }) => {
     return () => observer.disconnect();
   }, [designWidth]);
 
+  // Retourner le composant Window avec la webview à l'intérieur
   return (
-    <Window config={config} onAction={onAction}>
+    <Window config={config}>
       <div ref={containerRef} className="relative h-full w-full">
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white">
@@ -57,7 +58,6 @@ const WebViewWindow = ({ config, onAction, designWidth = 1280 }) => {
         )}
         <webview
           ref={webviewRef}
-          title={config.url}
           src={config.url}
           className="w-full h-full border-none"
         />

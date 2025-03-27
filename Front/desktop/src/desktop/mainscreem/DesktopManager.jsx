@@ -2,10 +2,12 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import DesktopIcon from './DesktopIcon';
 import { useApp } from './../AppContext';
 import { useContextMenu } from "../contextual_menu/ContextMenuContext";
+import { useWindowContext } from '../window/WindowContext';
 
 const DesktopManager = () => {
   const { desktopIcons, handleIconAction, createNewFolder, bgRef } = useApp();
   const { showContextMenu } = useContextMenu();
+  const { addApp } = useWindowContext();
   const desktopRef = useRef(null);
   const [desktopBounds, setDesktopBounds] = useState({
     width: 0,
@@ -14,6 +16,7 @@ const DesktopManager = () => {
     bottomOffset: 70  // Hauteur de la Dock
   });
   const [selectedIcon, setSelectedIcon] = useState(null);
+  
 
   const updateBounds = () => {
     if (desktopRef.current) {
@@ -34,7 +37,6 @@ const DesktopManager = () => {
     setSelectedIcon(iconId);
   };
 
-  function sortIcons(type){};
 
   const handleDesktopContextMenu = useCallback((e) => {
     e.preventDefault();
@@ -45,8 +47,8 @@ const DesktopManager = () => {
         action: () => createNewFolder("Nouveau dossier", { x: e.clientX, y: e.clientY })
       },
       { separator: true },
+      { label: "Afficher les Images", action: () => addApp('Galerie') },
       { label: "Changer le fond d'écran", action: () => bgRef.current?.refreshBackground() },
-      { separator: true },
       { label: "Enregistrer le fond d'écran", action: () => bgRef.current?.saveCurrentBackground() },
       { separator: true },
       { 

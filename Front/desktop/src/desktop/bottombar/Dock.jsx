@@ -3,16 +3,17 @@
 import { memo, useEffect, useCallback, useRef, useState } from "react";
 import { useTheme } from "./../../theme/ThemeContext";
 import { useWebApps } from "../../Apps/AppManager";
-import { useApp } from "../AppContext";
-import AppList from './../../Apps/AppInit';
+import AppList from './../../Apps/AppWeb';
+import { useWindowContext } from './../window/WindowContext';
 
 const Dock = () => {
   const { theme } = useTheme();
   const { batchAddApps, apps, loading, error } = useWebApps();
-  const { setWindows, windows } = useApp();
   const [visibleAppsCount, setVisibleAppsCount] = useState(apps.length);
   const dockRef = useRef(null);
   const resizeFrame = useRef(null);
+  const { addWindow } = useWindowContext();
+
 
   useEffect(() => {
     batchAddApps(AppList);
@@ -99,19 +100,7 @@ const Dock = () => {
             <div
               key={app.id}
               className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[48px]"
-              onClick={() =>
-                setWindows([
-                  ...windows,
-                  {
-                    id: app.id,
-                    url: app.url,
-                    minimized: false,
-                    maximized: false,
-                    zIndex: 1,
-                    position: { x: 100, y: 100 },
-                    size: { width: 350, height: 300 },
-                  },
-                ])
+              onClick={() =>addWindow(app)
               }
             >
               <div className="rounded-lg p-1.5 bg-gray-100/20 hover:bg-gray-100/30 transition-colors duration-200">
