@@ -1,13 +1,15 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import DesktopIcon from './DesktopIcon';
 import { useApp } from './../AppContext';
 import { useContextMenu } from "../contextual_menu/ContextMenuContext";
 import { useWindowContext } from '../window/WindowContext';
+import { useWebApps } from '../../Apps/AppManager';
+import IconGrid from './DesktopIcon';
 
 const DesktopManager = () => {
-  const { desktopIcons, handleIconAction, createNewFolder, bgRef } = useApp();
+  const { createNewFolder, bgRef } = useApp();
+  const { apps } = useWebApps();
   const { showContextMenu } = useContextMenu();
-  const { addApp } = useWindowContext();
+  const { addApp, addWindow } = useWindowContext();
   const desktopRef = useRef(null);
   const [desktopBounds, setDesktopBounds] = useState({
     width: 0,
@@ -15,7 +17,6 @@ const DesktopManager = () => {
     topOffset: 28,    // Hauteur de la TopBar
     bottomOffset: 70  // Hauteur de la Dock
   });
-  const [selectedIcon, setSelectedIcon] = useState(null);
   
 
   const updateBounds = () => {
@@ -28,15 +29,6 @@ const DesktopManager = () => {
       }));
     }
   };
-
-  const handleDesktopClick = () => {
-    setSelectedIcon(null); 
-  };
-
-  const handleIconSelect = (iconId) => {
-    setSelectedIcon(iconId);
-  };
-
 
   const handleDesktopContextMenu = useCallback((e) => {
     e.preventDefault();
@@ -116,37 +108,6 @@ const DesktopManager = () => {
   }, [createNewFolder, showContextMenu]);
   
 
-  const handleIconContextMenu = useCallback((e, icon) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const menuItems = [
-      { label: "Ouvrir", action: () => handleIconAction(icon.id, 'open') },
-      { label: "Renommer", action: () => handleIconAction(icon.id, 'rename') },
-      { separator: true },
-      { label: "Copier" },
-      { label: "Couper" },
-      { label: "Coller", disabled: true },
-      { separator: true },
-      { 
-        label: "Partager", 
-        submenu: [
-          { label: "AirDrop" },
-          { label: "Email" },
-          { label: "Messages" }
-        ] 
-      },
-      { separator: true },
-      { 
-        label: "Supprimer", 
-        action: () => handleIconAction(icon.id, 'delete'),
-        className: "text-red-500 hover:text-white hover:bg-red-500"
-      }
-    ];
-
-    showContextMenu(menuItems, { x: e.clientX, y: e.clientY });
-  }, [handleIconAction, showContextMenu]);
-
   useEffect(() => {
     updateBounds();
     window.addEventListener('resize', updateBounds);
@@ -161,20 +122,10 @@ const DesktopManager = () => {
         top: `${desktopBounds.topOffset}px`,
         height: `calc(100% - ${desktopBounds.topOffset + desktopBounds.bottomOffset}px)`
       }}
-      onClick={handleDesktopClick}
       onContextMenu={handleDesktopContextMenu}
     >
-      {desktopIcons.map(icon => (
-        <DesktopIcon
-          key={icon.id}
-          {...icon}
-          desktopBounds={desktopBounds}
-          isSelected={selectedIcon === icon.id}
-          onSelect={handleIconSelect}
-          onAction={(action) => handleIconAction(icon.id, action)}
-          onContextMenu={(e) => handleIconContextMenu(e, icon)}
-        />
-      ))}
+        <IconGrid icons={apps} action={addWindow} />
+
     </div>
   );
 };

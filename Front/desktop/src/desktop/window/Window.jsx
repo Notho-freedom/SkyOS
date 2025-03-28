@@ -90,7 +90,7 @@ const Window = ({ config, children }) => {
               className="w-3 h-3 bg-green-500 rounded-full hover:bg-green-600 transition-colors"
             />
           </div>
-          <span className="text-gray-700 truncate px-3">{windowState.url}</span>
+          <span className="text-gray-700 truncate px-3">{windowState.name || windowState.url}</span>
           <div className="w-3 h-3" />
         </div>
         <div className="w-full h-full">{children}</div>
