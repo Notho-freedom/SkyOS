@@ -32,6 +32,7 @@ const DesktopManager = () => {
 
   const handleDesktopContextMenu = useCallback((e) => {
     e.preventDefault();
+    e.stopPropagation();
   
     const menuItems = [
       { 

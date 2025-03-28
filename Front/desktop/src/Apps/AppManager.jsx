@@ -1,7 +1,9 @@
-import { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import db from './db';  // Assure-toi que db.js est bien configuré pour gérer la base de données
 import axios from 'axios';
+
+//db.clearDB();
 
 const API_KEY = '82159ce3ac0da6bed5b7c9f9aeb7f3ce'; // Clé API de mylinkpreview.net
 
@@ -33,6 +35,7 @@ function reducer(state, action) {
 export const WebAppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { apps } = state;
+  const [sApp, setSapp] = useState({});
 
   const appsRef = useRef(apps);
   useEffect(() => {
@@ -58,7 +61,18 @@ export const WebAppProvider = ({ children }) => {
     "https://thingproxy.freeboard.io/fetch/",
     "https://jsonp.afeld.me/?url=",
     "https://corsproxy.io/?",
+    "https://proxy.cors.sh/?url=", // Proxy permettant d'ouvrir des pages en contournant les restrictions CORS
+    "https://www.yourproxy.io?url=", // Autre option pour contourner CORS
+    "https://crossorigin.me/", // Proxy CORS
+    "https://api.codetabs.com/v1/proxy/?quest=", // Proxy API permettant de contourner CORS
+    "https://www.microlink.io/?url=", // Microlink.io proxy permettant d’obtenir les métadonnées et données d’URL
+    "https://proxyapi.io/api/?url=", // Proxy API permettant de récupérer des données d’URL
+    "https://webhook.site/", // Site qui permet de créer des Webhooks pour tester des APIs
+    "https://cors.io/?", // Proxy permettant d'effectuer des requêtes sans restriction CORS
+    "https://allorigins.win/raw?url=", // Autre service de proxy pour contourner les restrictions CORS
+    "https://api.rebrandly.com/v1/proxy?url=" // Proxy pour des requêtes API
   ];
+  
   
   const fetchAppMetadata = useCallback(async (url) => {
     // Essayer d'abord Microlink
@@ -67,8 +81,10 @@ export const WebAppProvider = ({ children }) => {
       if (data && data.data) {
         const title = data.data.title || new URL(url).hostname;
         const favicon = data.data.icon || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(url).hostname}`;
+        const description = data.data.description || "";
+        const image = data.data.image || "";
         console.log("✅ Métadonnées récupérées via Microlink");
-        return { title, favicon };
+        return { title, favicon, description, image };
       }
     } catch (err) {
       console.warn(`❌ Erreur avec Microlink: ${err.message}`);
@@ -79,7 +95,7 @@ export const WebAppProvider = ({ children }) => {
       try {
         const response = await fetch(proxy + url);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        
+  
         const html = await response.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
@@ -89,13 +105,23 @@ export const WebAppProvider = ({ children }) => {
           doc.querySelector("title")?.innerText ||
           new URL(url).hostname;
   
+        const description =
+          doc.querySelector("meta[property='og:description']")?.content ||
+          doc.querySelector("meta[name='description']")?.content ||
+          "";
+  
         let favicon = doc.querySelector("link[rel~='icon']")?.href;
         if (!favicon) {
           favicon = `https://www.google.com/s2/favicons?sz=64&domain=${new URL(url).hostname}`;
         }
   
+        const image =
+          doc.querySelector("meta[property='og:image']")?.content ||
+          doc.querySelector("meta[name='twitter:image']")?.content ||
+          "";
+  
         console.log(`✅ Métadonnées récupérées via ${proxy}`);
-        return { title, favicon };
+        return { title, favicon, description, image };
       } catch (err) {
         console.warn(`❌ Proxy échoué: ${proxy} → ${err.message}`);
       }
@@ -107,10 +133,17 @@ export const WebAppProvider = ({ children }) => {
       return {
         title: data.title || new URL(url).hostname,
         favicon: data.image || `https://www.google.com/s2/favicons?sz=64&domain=${new URL(url).hostname}`,
+        description: data.description || "",
+        image: data.image || "",
       };
     } catch (err) {
       console.error("🚨 Erreur avec l'API mylinkpreview.net :", err.message);
-      return { title: "Site inconnu", favicon: "" };
+      return { 
+        title: "Web App", 
+        favicon: "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg", 
+        description: "", 
+        image: "" 
+      };
     }
   }, []);
   
@@ -124,7 +157,7 @@ export const WebAppProvider = ({ children }) => {
       }
 
       const id = uuidv4(); // Générer un UUID unique
-      const { title, favicon } = await fetchAppMetadata(url);
+      const { title, favicon, description, image } = await fetchAppMetadata(url);
 
       if (!title && !favicon) {
         throw new Error('Impossible de récupérer les métadonnées');
@@ -136,6 +169,8 @@ export const WebAppProvider = ({ children }) => {
         url,
         icon: favicon,
         createdAt: new Date().toISOString(),
+        description,
+        image,
       };
 
       await db.addApp(newApp); // Ajouter l'app à la base de données
@@ -174,6 +209,8 @@ export const WebAppProvider = ({ children }) => {
         addApp,
         batchAddApps,
         removeApp,
+        sApp, 
+        setSapp,
       }}
     >
       {children}

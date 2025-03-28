@@ -40,7 +40,8 @@ export const WindowProvider = ({ children }) => {
   }, [windows]);
 
   // Fonction pour ajouter une application par son nom
-  const addApp = (appName) => {
+  const addApp = (appName,config={}) => {
+    
     // Trouver l'application correspondante dans la liste
     const app = apps.find(app => app.name === appName);
 
@@ -48,13 +49,7 @@ export const WindowProvider = ({ children }) => {
       console.error(`Application "${appName}" non trouvée!`);
       return;
     }
-
-    const appConfig = {
-      id: `app-${appName}`,
-      name: appName,
-      component: app.component,
-    };
-    addWindow(appConfig); // Ajouter la fenêtre de l'application
+    addWindow({...app,...config}); // Ajouter la fenêtre de l'application
   };
 
   // Fonction pour gérer les actions sur les fenêtres

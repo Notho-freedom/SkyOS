@@ -5,7 +5,7 @@ class WebAppDB extends Dexie {
   constructor() {
     super('WebAppDatabase');
     this.version(1).stores({
-      apps: '&url, id, name, icon, createdAt', // `&` indique la clé primaire (ici l'URL)
+      apps: '&url, id, name, icon, createdAt, description, image', // `&` indique la clé primaire (ici l'URL)
     });
   }
 

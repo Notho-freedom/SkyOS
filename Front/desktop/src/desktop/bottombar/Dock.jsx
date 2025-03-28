@@ -14,7 +14,6 @@ const Dock = () => {
   const resizeFrame = useRef(null);
   const { addWindow } = useWindowContext();
 
-
   useEffect(() => {
     batchAddApps(AppList);
   }, [batchAddApps]);
@@ -100,15 +99,14 @@ const Dock = () => {
             <div
               key={app.id}
               className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[48px]"
-              onClick={() =>addWindow(app)
-              }
+              onClick={() =>addWindow(app)}
             >
               <div className="rounded-lg p-1.5 bg-gray-100/20 hover:bg-gray-100/30 transition-colors duration-200">
                 <img
                   src={app.icon}
                   alt={app.name}
                   className="h-8 w-8 object-cover rounded"
-                  onError={(e) => (e.target.src = "/default-icon.png")}
+                  onError={(e) => (e.target.src = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg")}
                 />
               </div>
 
