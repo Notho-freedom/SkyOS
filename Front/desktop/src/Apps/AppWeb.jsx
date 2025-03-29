@@ -39,7 +39,8 @@ const AppList = [
   "https://www.pandora.com/",
   "https://www.vimeo.com/",
 
-  // Réseaux sociaux & autres
+  // Réseaux sociaux
+  "https://www.facebook.com/",
   "https://twitter.com/",
   "https://www.reddit.com/",
   "https://www.instagram.com/",
@@ -50,10 +51,19 @@ const AppList = [
   "https://www.quora.com/",
   "https://www.medium.com/",
   "https://www.tumblr.com/",
+  "https://www.threads.net/", // Threads (Meta)
+  "https://www.wechat.com/", // WeChat
+  "https://www.telegram.org/", // Telegram
+  "https://www.whatsapp.com/", // WhatsApp
+  "https://www.mastodon.social/", // Mastodon
+  "https://www.vero.co/", // Vero
+  "https://www.clubhouse.com/", // Clubhouse
+  "https://www.bereal.com/", // BeReal
+  "https://www.kwai.com/", // Kwai
+  "https://www.mewe.com/", // MeWe
 
   // Autres outils utiles
   "https://www.weather.com/",
-  "https://www.wolframalpha.com/",
   "https://www.zapier.com/",
 ];
 

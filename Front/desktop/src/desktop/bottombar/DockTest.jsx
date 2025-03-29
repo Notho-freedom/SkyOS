@@ -9,14 +9,40 @@ import { useWindowContext } from './../window/WindowContext';
 // Composant de la sphère
 const Sphere = () => {
   return (
-    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-white animate-spin-slow z-50 flex justify-center items-center">
+    <div className="relative w-24 h-24 group cursor-pointer">
+      {/* Sphère principale */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 to-sky-200 animate-complexSpin transform-gpu">
+        
+        {/* Noyau lumineux */}
+        <div className="absolute inset-2 rounded-full bg-gradient-to-b from-white/40 to-transparent animate-pulse"></div>
+        
+        {/* Énergie tourbillonnante */}
+        <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-cyan-300/30 to-blue-400/30 animate-energyFlow mix-blend-screen"></div>
+        
+        {/* Reflets dynamiques */}
+        <div className="absolute inset-0 rounded-full border-2 border-white/10 animate-dynamicReflect"></div>
+      </div>
+
+      {/* Halo interactif */}
+      <div className="absolute -inset-6 rounded-full bg-radial-gradient(from_60%_60%, #00aaff10, transparent 60%) animate-haloPulse mix-blend-lighten"></div>
+
+      {/* Particules flottantes */}
+      <div className="absolute inset-0 rounded-full animate-particleFloat">
+        {[...Array(12)].map((_, i) => (
+          <div key={i} className="absolute w-1 h-1 bg-white/30 rounded-full" 
+               style={{
+                 left: `${Math.random() * 80 + 10}%`,
+                 top: `${Math.random() * 80 + 10}%`
+               }}/>
+        ))}
+      </div>
     </div>
   );
 };
 
 const Dock = () => {
   const { theme } = useTheme();
-  const { batchAddApps, apps, loading, Refresh } = useWebApps();
+  const { batchAddApps, apps, loading, error } = useWebApps();
   const [visibleAppsCount, setVisibleAppsCount] = useState(apps.length);
   const dockRef = useRef(null);
   const resizeFrame = useRef(null);
@@ -24,7 +50,7 @@ const Dock = () => {
 
   useEffect(() => {
     batchAddApps(AppList);
-  }, [Refresh, batchAddApps]);
+  }, [batchAddApps]);
 
   const handleResize = useCallback(() => {
     if (resizeFrame.current) {
@@ -109,7 +135,8 @@ const Dock = () => {
                   alt={app.name}
                   className="h-6 w-6 object-cover rounded"
                   onError={(e) =>
-                    (e.target.src =app.image)
+                    (e.target.src =
+                      "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg")
                   }
                 />
               </div>
@@ -146,7 +173,8 @@ const Dock = () => {
                   alt={app.name}
                   className="h-6 w-6 object-cover rounded"
                   onError={(e) =>
-                    (e.target.src = app.image)
+                    (e.target.src =
+                      "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg")
                   }
                 />
               </div>

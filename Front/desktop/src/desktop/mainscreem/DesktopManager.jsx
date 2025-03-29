@@ -4,12 +4,13 @@ import { useContextMenu } from "../contextual_menu/ContextMenuContext";
 import { useWindowContext } from '../window/WindowContext';
 import { useWebApps } from '../../Apps/AppManager';
 import IconGrid from './DesktopIcon';
+import db from './../../Apps/db';
 
 const DesktopManager = () => {
   const { createNewFolder, bgRef } = useApp();
-  const { apps } = useWebApps();
+  const { Refresh, setRefresh } = useWebApps();
   const { showContextMenu } = useContextMenu();
-  const { addApp, addWindow } = useWindowContext();
+  const { addApp } = useWindowContext();
   const desktopRef = useRef(null);
   const [desktopBounds, setDesktopBounds] = useState({
     width: 0,
@@ -30,11 +31,20 @@ const DesktopManager = () => {
     }
   };
 
+  const refresh = () => {
+    db.clearDB();
+    bgRef.current?.refreshBackground();
+    //setRefresh(!Refresh);
+    
+  }
+
   const handleDesktopContextMenu = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
   
     const menuItems = [
+      { label: 'actualisé', action: () => refresh() },
+      { separator: true },
       { 
         label: "Nouveau dossier", 
         action: () => createNewFolder("Nouveau dossier", { x: e.clientX, y: e.clientY })
@@ -125,7 +135,7 @@ const DesktopManager = () => {
       }}
       onContextMenu={handleDesktopContextMenu}
     >
-        <IconGrid icons={apps} action={addWindow} />
+        <IconGrid/>
 
     </div>
   );

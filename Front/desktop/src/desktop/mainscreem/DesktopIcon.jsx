@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "tailwindcss/tailwind.css";
@@ -8,10 +8,11 @@ import { useWebApps } from './../../Apps/AppManager';
 
 const ReactGridLayout = WidthProvider(RGL);
 
-const IconGrid = ({ icons, action }) => {
+const IconGrid = () => {
   const { showContextMenu } = useContextMenu();
-  const { addWindow, addApp  } = useWindowContext();
-  const { setSapp } = useWebApps();
+  const { addWindow, addApp, handleWindowAction  } = useWindowContext();
+  const { apps, setSapp } = useWebApps();
+  const [cols, setCols] = useState(6);
   
   const handleIconContextMenu = useCallback((e, icon) => {
     e.preventDefault();
@@ -176,42 +177,60 @@ const IconGrid = ({ icons, action }) => {
     ];
   
     showContextMenu(menuItems, { x: e.clientX, y: e.clientY });
-  }, []);
+  }, [addApp,addWindow,setSapp,showContextMenu]);
   
 
-  const layout = icons.map((icon, index) => ({
+  useEffect(() => {
+    const updateGrid = () => {
+      const iconSize = 110; // Taille d'une icône (48px + padding/marge)
+      const margin = 40; // Marge totale
+      const availableHeight = window.innerHeight - margin;
+      const rows = Math.max(1, Math.floor(availableHeight / iconSize)) -0; // Évite division par 0
+      setCols(Math.max(1, Math.ceil(apps.length / rows))); // Minimum 1 colonne
+    };
+
+    updateGrid();
+    window.addEventListener("resize", updateGrid);
+    return () => window.removeEventListener("resize", updateGrid);
+  }, [apps.length]);
+
+
+
+  const layout = apps.map((icon, index) => ({
     i: icon.id,
-    x: index % 5, // Ajuste dynamiquement les colonnes
-    y: Math.floor(index / 7),
+    x: index % cols, // Placement horizontal
+    y: Math.floor(index / cols), // Placement vertical
     w: 1,
     h: 1,
   }));
 
   return (
-    <div className="w-full h-full">
+    <div className="layout mb-10">
       <ReactGridLayout
-        className="layout"
+        key={cols} // 🔥 Force le re-render quand cols change
+        className=""
         layout={layout}
-        cols={17} // S'adapte aux écrans larges
-        rowHeight={window.innerHeight / 11} // Ajuste la hauteur selon l'écran
-        width={window.innerWidth - 40} // Garde un padding
+        cols={cols*2}
+        rowHeight={100}
+        width={window.innerWidth - 40}
+        rowWidth={50}
         isDraggable
         isResizable={false}
         autoSize={true}
         compactType="vertical"
       >
-        {icons.map((icon) => (
+        {apps.map((icon) => (
           <div
             key={icon.id}
-            className="flex flex-col items-center justify-center p-2 rounded-2xl transition-transform duration-300 hover:scale-110 hover:shadow-xl"
-            onDoubleClick={() => action(icon)}
+            className="flex flex-col items-center justify-center rounded-2xl transition-transform duration-300 hover:scale-110 hover:bg-neutral-300"
+            onDoubleClick={() => handleWindowAction(icon)}
             onContextMenu={(e) => handleIconContextMenu(e,icon)}
           >
             <img 
               src={icon.icon} 
               alt="icon" 
               className="w-10 h-10 rounded-lg p-1 bg-gray-100/20 hover:bg-gray-100/30 transition-colors duration-200" 
-              onError={(e) => (e.target.src = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg")}
+              onError={(e) => (e.target.src = icon.image || "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg")}
             />
             <span className="mt-1 text-xs text-white truncate sm:w-10 md:w-15 lg:w-20 text-center">{icon.name}</span>
           </div>

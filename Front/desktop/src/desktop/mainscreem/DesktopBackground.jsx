@@ -28,9 +28,9 @@ const DesktopBackground = forwardRef(({
   const [imageLoaded, setImageLoaded] = useState(false); // Gère l'état de chargement de l'image
   const API_KEY = 'eDfjR7DwNjtup2rMR4B4fQ==yzwNblaGbUAgT1MQ';
 
+  //['nature', 'city', 'technology', 'food','still_life', 'abstract', 'wildlife']
   const categories = useMemo(() => [
-    'nature', 'city', 'technology', 'food',
-    'still_life', 'abstract', 'wildlife'
+    'nature', 'city', 'technology'
   ], []);
 
   const fetchRandomImage = useCallback(async () => {

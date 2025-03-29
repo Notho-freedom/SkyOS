@@ -6,17 +6,9 @@ import { useWebApps } from "../../Apps/AppManager";
 import AppList from './../../Apps/AppWeb';
 import { useWindowContext } from './../window/WindowContext';
 
-// Composant de la sphère
-const Sphere = () => {
-  return (
-    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-white animate-spin-slow z-50 flex justify-center items-center">
-    </div>
-  );
-};
-
 const Dock = () => {
   const { theme } = useTheme();
-  const { batchAddApps, apps, loading, Refresh } = useWebApps();
+  const { batchAddApps, apps, loading, error } = useWebApps();
   const [visibleAppsCount, setVisibleAppsCount] = useState(apps.length);
   const dockRef = useRef(null);
   const resizeFrame = useRef(null);
@@ -24,7 +16,7 @@ const Dock = () => {
 
   useEffect(() => {
     batchAddApps(AppList);
-  }, [Refresh, batchAddApps]);
+  }, [batchAddApps]);
 
   const handleResize = useCallback(() => {
     if (resizeFrame.current) {
@@ -81,74 +73,42 @@ const Dock = () => {
   }, [apps, handleResize]);
 
   return (
-    <div className="fixed left-1/4 bottom-2 flex items-center justify-center space-x-4 z-50">
+    <div className="relative">
 
-      {/* Barre gauche */}
       <div
         ref={dockRef}
-        className={`flex flex-row justify-center items-center gap-1 min-h-[40px] ${
+        className={`fixed w-auto bottom-4 left-1/2 transform -translate-x-1/2 m-1 p-1 min-h-[50px] ${
           theme.name === "dark"
             ? "bg-gray-900/80 border-gray-700"
             : "bg-white/20 border-gray-200"
-        } backdrop-blur-lg border rounded-2xl shadow-xl z-50`}
+        } backdrop-blur-lg border rounded-2xl flex flex-row justify-center items-center gap-2 z-50 shadow-xl`}
       >
         {loading ? (
           <div className="flex items-center justify-center">
-            <div className="w-4 h-4 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
+            <div className="w-6 h-6 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
           </div>
         ) : (
-          apps.slice(0, visibleAppsCount / 2).map((app) => (
+          apps.slice(0, visibleAppsCount).map((app) => (
             <div
               key={app.id}
-              className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[40px]"
-              onClick={() => addWindow(app)}
+              className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[48px]"
+              onClick={() =>addWindow(app)}
             >
-              <div className="rounded-lg p-1.5 hover:bg-gray-100/30 transition-colors duration-200">
+              <div className="rounded-lg p-1.5 bg-gray-100/20 hover:bg-gray-100/30 transition-colors duration-200">
                 <img
                   src={app.icon}
                   alt={app.name}
-                  className="h-6 w-6 object-cover rounded"
-                  onError={(e) =>
-                    (e.target.src =app.image)
-                  }
+                  className="h-8 w-8 object-cover rounded"
+                  onError={(e) => (e.target.src = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg")}
                 />
               </div>
-            </div>
-          ))
-        )}
-      </div>
 
-      {/* Sphère au centre */}
-      <Sphere />
-
-      {/* Barre droite */}
-      <div
-        className={`flex flex-row justify-center items-center gap-1 min-h-[40px] ${
-          theme.name === "dark"
-            ? "bg-gray-900/80 border-gray-700"
-            : "bg-white/20 border-gray-200"
-        } backdrop-blur-lg border rounded-2xl shadow-xl z-50`}
-      >
-        {loading ? (
-          <div className="flex items-center justify-center">
-            <div className="w-4 h-4 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
-          </div>
-        ) : (
-          apps.slice(visibleAppsCount / 2, visibleAppsCount).map((app) => (
-            <div
-              key={app.id}
-              className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[40px]"
-              onClick={() => addWindow(app)}
-            >
-            <div className="rounded-lg p-1.5 transition-colors duration-200">
-              <img
-                  src={app.icon}
-                  alt={app.name}
-                  className="h-6 w-6 object-cover rounded"
-                  onError={(e) =>
-                    (e.target.src = app.image)
-                  }
-                />
+              <div
+                className={`absolute -top-8 px-2 py-1 ${
+                  theme.name === "dark" ? "bg-gray-700" : "bg-gray-800"
+                } text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none`}
+              >
+                {app.name}
               </div>
             </div>
           ))

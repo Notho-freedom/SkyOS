@@ -36,22 +36,26 @@ export const WebAppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { apps } = state;
   const [sApp, setSapp] = useState({});
+  const divRef = useRef(null);
+  const [Refresh, setRefresh] = useState(true);
 
   const appsRef = useRef(apps);
   useEffect(() => {
     appsRef.current = apps;
   }, [apps]);
 
+
+  const loadApps = async () => {
+    try {
+      const storedApps = await db.getApps();
+      dispatch({ type: 'SET_APPS', payload: storedApps });
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', payload: 'Erreur de chargement des applications' });
+    }
+  };
+
   // Charger les applications depuis la base de données
   useEffect(() => {
-    const loadApps = async () => {
-      try {
-        const storedApps = await db.getApps();
-        dispatch({ type: 'SET_APPS', payload: storedApps });
-      } catch (err) {
-        dispatch({ type: 'SET_ERROR', payload: 'Erreur de chargement des applications' });
-      }
-    };
     loadApps();
   }, []);
 
@@ -140,7 +144,7 @@ export const WebAppProvider = ({ children }) => {
       console.error("🚨 Erreur avec l'API mylinkpreview.net :", err.message);
       return { 
         title: "Web App", 
-        favicon: "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg", 
+        favicon: "", 
         description: "", 
         image: "" 
       };
@@ -204,6 +208,7 @@ export const WebAppProvider = ({ children }) => {
     <WebAppContext.Provider
       value={{
         apps,
+        divRef,
         loading: state.loading,
         error: state.error,
         addApp,
@@ -211,6 +216,8 @@ export const WebAppProvider = ({ children }) => {
         removeApp,
         sApp, 
         setSapp,
+        Refresh, 
+        setRefresh,
       }}
     >
       {children}

@@ -57,3 +57,57 @@ code {
 .app-details-card {
   animation: slideIn 0.3s ease-out;
 }
+
+
+@keyframes complexSpin {
+    0% {
+      transform: rotate(0deg) scale(1) rotate3d(1, 2, 1, 0deg);
+    }
+    50% {
+      transform: rotate(180deg) scale(1.1) rotate3d(2, 1, 2, 180deg);
+    }
+    100% {
+      transform: rotate(360deg) scale(1) rotate3d(1, 2, 1, 360deg);
+    }
+  }
+
+  @keyframes energyFlow {
+    0% { transform: rotate(0deg) scale(1); opacity: 0.8; }
+    50% { transform: rotate(180deg) scale(1.2); opacity: 0.4; }
+    100% { transform: rotate(360deg) scale(1); opacity: 0.8; }
+  }
+
+  @keyframes haloPulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.4); opacity: 0.3; }
+  }
+
+  @keyframes dynamicReflect {
+    0%, 100% { clip-path: polygon(0% 0%, 100% 0%, 50% 50%, 0% 100%); }
+    50% { clip-path: polygon(100% 0%, 100% 100%, 50% 50%, 0% 0%); }
+  }
+
+  @keyframes particleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .animate-complexSpin {
+    animation: complexSpin 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  .animate-energyFlow {
+    animation: energyFlow 6s linear infinite;
+  }
+
+  .animate-haloPulse {
+    animation: haloPulse 4s ease-in-out infinite;
+  }
+
+  .animate-dynamicReflect {
+    animation: dynamicReflect 8s linear infinite;
+  }
+
+  .animate-particleFloat {
+    animation: particleFloat 3s ease-in-out infinite;
+  }
