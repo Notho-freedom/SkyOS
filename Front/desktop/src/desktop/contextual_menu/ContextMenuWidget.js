@@ -1,3 +1,5 @@
+// src/desktop/contextmenu/ContextMenuWidget.js
+
 "use client"
 
 import { useEffect, useRef, useState } from "react"
@@ -28,6 +30,8 @@ const ContextMenuWidget = ({ items, position, onClose }) => {
         x: rect.right + 5,
         y: rect.top
       })
+    } else {
+      setSubMenu(null)
     }
   }
 
@@ -113,6 +117,7 @@ const ContextMenuWidget = ({ items, position, onClose }) => {
             left: `${subMenuPosition.x}px`,
             top: `${subMenuPosition.y}px`,
           }}
+          onMouseLeave={() => setSubMenu(null)}
         >
           {renderItems(subMenu)}
         </div>
@@ -120,5 +125,4 @@ const ContextMenuWidget = ({ items, position, onClose }) => {
     </>
   )
 }
-
 export default ContextMenuWidget

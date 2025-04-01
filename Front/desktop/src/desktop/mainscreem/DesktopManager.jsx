@@ -5,6 +5,7 @@ import { useWindowContext } from '../window/WindowContext';
 import { useWebApps } from '../../Apps/AppManager';
 import IconGrid from './DesktopIcon';
 import db from './../../Apps/db';
+import SettingsApp from "../../components/settings/SettingsApp";
 
 const DesktopManager = () => {
   const { createNewFolder, bgRef } = useApp();
@@ -105,6 +106,7 @@ const DesktopManager = () => {
         ] 
       },
       { separator: true },
+      { label: "Paramètres", action: () => addApp('Paramètres') },
       { 
         label: "Paramètres avancés", 
         submenu: [

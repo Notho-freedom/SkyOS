@@ -8,6 +8,8 @@ import Dock from './desktop/bottombar/Dock';
 import { useTranslation } from "react-i18next";
 import DesktopManager from './desktop/mainscreem/DesktopManager';
 import WindowManager from './desktop/window/WindowManager';
+//A ne pas suprimer
+import i18n from "./i18n";
 import { ThemeProvider } from "./theme/ThemeContext"
 import { ContextMenuProvider } from "./desktop/contextual_menu/ContextMenuContext";
 import { Toaster } from "sonner";
