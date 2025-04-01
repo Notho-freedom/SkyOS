@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import PropTypes from 'prop-types';
 import db from './db/backgroundsDb'; // IndexedDB via Dexie
+import { showNotification } from '../notify/notifications';
 
 const blobToDataURL = (blob) =>
   new Promise((resolve, reject) => {
@@ -52,14 +53,17 @@ const DesktopBackground = forwardRef(({
       const blob = await response.blob();
       return URL.createObjectURL(blob);
     } catch (error) {
+      showNotification('Erreur de récupération de l’image en ligne',error,'error' );
       console.error('Erreur de récupération de l’image en ligne:', error);
       return null;
     }
   }, [width, height, API_KEY, categories]);
 
   const refreshBackground = useCallback(async () => {
-    setLoading(true); // Afficher le loader uniquement au début
-    setImageLoaded(false); // Réinitialiser le statut de chargement de l'image
+    showNotification('Systeme', "Arriere plan charger", 'success');
+    setLoading(true);
+    setImageLoaded(false);
+    
     try {
       const newBg = await fetchRandomImage();
       if (!newBg) {
@@ -73,40 +77,52 @@ const DesktopBackground = forwardRef(({
         setLoading(false);
         return;
       }
-
+  
+      // Sauvegarder l'image avant de la définir comme fond d'écran
       const savedBackgrounds = await db.getAllBackgrounds();
       if (savedBackgrounds.length === 0) {
         try {
           const response = await fetch(newBg);
           const blob = await response.blob();
           const dataUrl = await blobToDataURL(blob);
+          
+          // Sauvegarde de l'image dans IndexedDB
           await db.addBackground(dataUrl);
+          showNotification('Arrire Plan', "Fond d'écran sauvegardé dans IndexedDB.", 'success');
           console.log("Fond d'écran sauvegardé dans IndexedDB.");
         } catch (err) {
           console.error("Erreur lors de la sauvegarde dans IndexedDB :", err);
         }
       }
-
+  
       setNextBg(newBg);
-      setImageLoaded(false); // Réinitialiser l'état de chargement de l'image suivante
+      setImageLoaded(false);
     } catch (error) {
+      showNotification('Erreur', 'Erreur de rafraîchissement.', 'error');
       console.error('Erreur de rafraîchissement:', error);
       setLoading(false);
     }
   }, [fetchRandomImage]);
-
+  
   const saveCurrentBackground = useCallback(async () => {
     if (!currentBg) return;
+    
     try {
       const response = await fetch(currentBg);
       const blob = await response.blob();
       const dataUrl = await blobToDataURL(blob);
+      
+      // Sauvegarde manuelle de l'image dans IndexedDB
       await db.addBackground(dataUrl);
+      showNotification('Fond d\'écran sauvegardé', 'Le fond d\'écran a été sauvegardé manuellement dans IndexedDB.', 'success');
       console.log("Fond d'écran sauvegardé manuellement dans IndexedDB.");
     } catch (err) {
+      showNotification('Erreur de sauvegarde', 'Erreur lors de la sauvegarde manuelle du fond d\'écran.', 'error');
       console.error("Erreur lors de la sauvegarde manuelle du fond d'écran :", err);
     }
   }, [currentBg]);
+  
+  
 
   const handleImageLoad = () => {
     setImageLoaded(true); // Indiquer que l'image a bien été chargée
@@ -130,6 +146,7 @@ const DesktopBackground = forwardRef(({
     };
   }, [currentBg, nextBg]);
 
+  //showNotification('Systeme', "Bienvenue", 'info');
   return (
     <div className="relative w-screen h-screen overflow-hidden">
       {/* Loader affiché pendant le chargement initial */}

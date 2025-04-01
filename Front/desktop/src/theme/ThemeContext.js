@@ -1,5 +1,6 @@
 // ThemeContext.js
 import { createContext, useContext, useState, useEffect } from "react"
+import { showNotification } from "../desktop/notify/notifications"
 
 const defaultTheme = {
   name: "default",
@@ -52,6 +53,7 @@ export const ThemeProvider = ({ children }) => {
   }, [theme])
 
   const toggleDarkMode = () => {
+    showNotification('System','Theme changer','info');
     setTheme(theme.name === "default" ? darkTheme : defaultTheme)
   }
 
