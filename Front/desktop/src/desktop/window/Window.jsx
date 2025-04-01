@@ -1,124 +1,99 @@
-import './window.css';
-import React, { useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Rnd } from 'react-rnd';
+import { useWindowContext } from './WindowContext'; // Importer le hook personnalisé
 
-const Window = ({ config, onAction, children }) => {
-  const rndRef = useRef(null);
-  const isMd = config.size.width > 700 ? "text-sm" : "text-xs";
-  const lastPosition = useRef(config.position);
-  const lastSize = useRef(config.size);
+const Window = ({ config, children }) => {
+  const { windows, handleWindowAction } = useWindowContext();
+  const [windowState, setWindowState] = useState(config);
 
-  // Mémoisation stable de handleAction
-  const handleAction = useCallback((action) => {
-    onAction(config.id, action);
-  }, [onAction, config.id]);
+  useEffect(() => {
+    const win = windows.find(w => w.id === config.id);
+    if (win) {
+      setWindowState(win);
+    }
+  }, [windows, config.id]);
 
-  // Gestion optimisée du redimensionnement
-  const handleResize = useCallback((e, direction, ref, delta, pos) => {
-    lastSize.current = { 
-      width: parseInt(ref.style.width), 
-      height: parseInt(ref.style.height) 
-    };
-    lastPosition.current = pos;
-    
-    // Mise à jour visuelle immédiate sans re-render
-    rndRef.current.updateSize(lastSize.current);
-    rndRef.current.updatePosition(lastPosition.current);
-  }, []);
+  // Gérer le focus de la fenêtre
+  const handleFocus = () => {
+    if (windowState) {
+      handleWindowAction({ id: windowState.id, type: 'FOCUS' });
+    }
+  };
 
-  // Gestion fluide du drag
-  const handleDrag = useCallback((e, data) => {
-    lastPosition.current = { x: data.x, y: data.y };
-    rndRef.current.updatePosition(lastPosition.current);
-  }, []);
+  // Déplacement fluide de la fenêtre
+  const handleDragStop = useCallback((e, data) => {
+    if (windowState) {
+      handleWindowAction({
+        id: windowState.id,
+        type: 'MOVE',
+        payload: { position: { x: data.x, y: data.y } },
+      });
+    }
+  }, [windowState, handleWindowAction]);
 
-  // Envoi des dernières valeurs au parent quand l'action est terminée
-  const handleDragStop = useCallback(() => {
-    handleAction({
-      type: 'MOVE',
-      position: lastPosition.current
-    });
-    document.body.classList.remove('dragging-active');
-  }, [handleAction]);
+  // Redimensionnement fluide de la fenêtre
+  const handleResizeStop = useCallback((e, direction, ref, delta, pos) => {
+    if (windowState) {
+      handleWindowAction({
+        id: windowState.id,
+        type: 'RESIZE',
+        payload: { size: { width: parseInt(ref.style.width), height: parseInt(ref.style.height) }, position: pos },
+      });
+    }
+  }, [windowState, handleWindowAction]);
 
-  const handleResizeStop = useCallback(() => {
-    handleAction({
-      type: 'RESIZE',
-      size: lastSize.current,
-      position: lastPosition.current
-    });
-  }, [handleAction]);
+  // Fonction de fermeture de la fenêtre
+  const handleCloseWindow = () => {
+    if (windowState) {
+      handleWindowAction({ id: windowState.id, type: 'CLOSE' });
+    }
+  };
+
+  // Si la fenêtre a été fermée, ne rien afficher
+  if (!windowState) return null;
 
   return (
     <Rnd
-      ref={rndRef}
-      size={config.size}
-      position={config.position}
+      size={windowState.size}
+      position={windowState.position}
       minWidth={300}
       minHeight={200}
       bounds="parent"
-      disableDragging={config.maximized}
-      onDragStart={() => {
-        document.body.classList.add('dragging-active');
-        handleAction({ type: 'FOCUS' });
-      }}
-      onDrag={handleDrag}
-      onDragStop={handleDragStop}
-      onResize={handleResize}
-      onResizeStop={handleResizeStop}
+      disableDragging={windowState.maximized}
+      onMouseDown={handleFocus} // Appel du handleFocus
+      onDragStop={handleDragStop} // Appel du handleDragStop
+      onResizeStop={handleResizeStop} // Appel du handleResizeStop
       enableResizing={{
-        top: true,
-        right: true,
-        bottom: true,
-        left: true,
-        topRight: true,
-        bottomRight: true,
-        bottomLeft: true,
-        topLeft: true
-      }}
-      resizeHandleClasses={{
-        top: 'resize-handle top',
-        right: 'resize-handle right',
-        bottom: 'resize-handle bottom',
-        left: 'resize-handle left',
-        topRight: 'resize-handle top-right',
-        bottomRight: 'resize-handle bottom-right',
-        bottomLeft: 'resize-handle bottom-left',
-        topLeft: 'resize-handle top-left'
+        top: true, right: true, bottom: true, left: true,
+        topRight: true, bottomRight: true, bottomLeft: true, topLeft: true,
       }}
       dragHandleClassName="draggable-handle"
-      className={`window-container ${config.maximized ? 'maximized' : ''}`}
-      style={{ 
-        zIndex: config.zIndex,
-        transition: config.maximized ? 'none' : 'opacity 0.2s ease' 
+      className={`window-container ${windowState.maximized ? 'maximized' : ''}`}
+      style={{
+        zIndex: windowState.zIndex,
+        transition: 'all 0.15s ease-out',
       }}
     >
-      <div 
-        className="flex flex-col h-full bg-white bg-opacity-95 rounded-lg shadow-lg overflow-hidden"
-        onMouseDown={() => handleAction({ type: 'FOCUS' })}
-      >
+      <div className="flex flex-col h-full bg-white bg-opacity-95 rounded-lg shadow-lg overflow-hidden">
         <div className="draggable-handle flex items-center justify-between bg-gray-200 px-4 py-2 cursor-move">
           <div className="flex space-x-2">
-            <button 
-              onClick={() => handleAction({ type: 'MINIMIZE' })}
+            <button
+              onClick={() => handleWindowAction({ id: windowState.id, type: 'MINIMIZE' })}
               className="w-3 h-3 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
             />
             <button
-              onClick={() => handleAction({ type: 'MAXIMIZE' })}
+              onClick={() => handleWindowAction({ id: windowState.id, type: 'MAXIMIZE' })}
               className="w-3 h-3 bg-yellow-500 rounded-full hover:bg-yellow-600 transition-colors"
             />
             <button
-              onClick={() => handleAction({ type: 'CLOSE' })}
+              onClick={handleCloseWindow} // Appel de la fonction handleCloseWindow
               className="w-3 h-3 bg-green-500 rounded-full hover:bg-green-600 transition-colors"
             />
           </div>
-          <span className={`${isMd} text-gray-700 truncate px-3`}>{config.url}</span>
+          <span className="text-gray-700 truncate px-3">{windowState.name || windowState.url}</span>
           <div className="w-3 h-3" />
         </div>
-        
-        <div className="w-full h-full">
-          {children}
-        </div>
+        <div className="w-full h-full">{children}</div>
       </div>
     </Rnd>
   );

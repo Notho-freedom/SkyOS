@@ -1,100 +1,220 @@
 "use client"
 
-import { useState, memo } from "react"
-import { useTheme } from "./../../theme/ThemeContext"
-import {
-  FaFolderOpen,
-  FaSafari,
-  FaAppStore,
-  FaCommentDots,
-  FaPhoneAlt,
-  FaMusic,
-  FaCalendar,
-  FaPhotoVideo,
-  FaBook,
-  FaTv,
-  FaPodcast,
-  FaTrash,
-  FaCog,
-} from "react-icons/fa"
+import { memo, useEffect, useCallback, useRef, useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { useTheme } from "../../theme/ThemeContext"
+import { useWebApps } from "../../Apps/AppManager"
+import AppList from "../../Apps/AppWeb"
+import { useWindowContext } from "../window/WindowContext"
+
+// Composant de la sphère centrale avec animation
+const Sphere = () => {
+  return (
+    <motion.div
+      className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 via-purple-400 to-blue-300 z-50 flex justify-center items-center shadow-lg"
+      initial={{ scale: 0.8 }}
+      animate={{
+        scale: [0.9, 1, 0.9],
+        rotate: [0, 180, 360],
+      }}
+      transition={{
+        duration: 8,
+        repeat: Number.POSITIVE_INFINITY,
+        ease: "easeInOut",
+      }}
+    >
+      <motion.div
+        className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md"
+        animate={{
+          scale: [1, 0.8, 1],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+        }}
+      />
+    </motion.div>
+  )
+}
+
+// Composant d'icône d'application avec animation au survol
+const AppIcon = ({ app, onClick }) => {
+  return (
+    <motion.div
+      className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[50px]"
+      onClick={onClick}
+      whileHover={{ scale: 1.2, y: -10 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+    >
+      <motion.div
+        className="rounded-xl p-1.5 transition-colors duration-200"
+        whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+      >
+        <img
+          src={app.icon || "/placeholder.svg"}
+          alt={app.name}
+          className="h-8 w-8 object-cover rounded-lg"
+          onError={(e) => (e.target.src = app.image)}
+        />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 5 }}
+        whileHover={{ opacity: 1, y: 0 }}
+        className="absolute -top-8 px-2 py-1 bg-black/70 text-white text-xs rounded-md whitespace-nowrap"
+      >
+        {app.name}
+      </motion.div>
+      <motion.div
+        className="w-1 h-1 rounded-full bg-white mt-1"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: app.isActive ? 1 : 0 }}
+      />
+    </motion.div>
+  )
+}
 
 const Dock = () => {
   const { theme } = useTheme()
-  const [hoveredApp, setHoveredApp] = useState(null)
+  const { batchAddApps, apps, loading, Refresh } = useWebApps()
+  const [visibleAppsCount, setVisibleAppsCount] = useState(apps.length)
+  const dockRef = useRef(null)
+  const resizeFrame = useRef(null)
+  const { addWindow } = useWindowContext()
 
-  const dockApps = [
-    { id: "finder", name: "Finder", icon: FaFolderOpen, color: "bg-blue-500" },
-    { id: "safari", name: "Safari", icon: FaSafari, color: "bg-gradient-to-r from-blue-400 to-blue-600" },
-    { id: "messages", name: "Messages", icon: FaCommentDots, color: "bg-gradient-to-r from-green-400 to-green-600" },
-    { id: "facetime", name: "FaceTime", icon: FaPhoneAlt, color: "bg-gradient-to-r from-green-500 to-emerald-600" },
-    { id: "photos", name: "Photos", icon: FaPhotoVideo, color: "bg-gradient-to-r from-indigo-500 to-purple-600" },
-    { id: "appstore", name: "App Store", icon: FaAppStore, color: "bg-gradient-to-r from-blue-500 to-blue-700" },
-    { id: "music", name: "Music", icon: FaMusic, color: "bg-gradient-to-r from-pink-500 to-red-600" },
-    { id: "calendar", name: "Calendar", icon: FaCalendar, color: theme.name === "dark" ? "bg-gray-700 text-white" : "bg-white text-black" },
-    { id: "books", name: "Books", icon: FaBook, color: "bg-gradient-to-r from-orange-400 to-orange-600" },
-    { id: "tv", name: "TV", icon: FaTv, color: "bg-gradient-to-r from-blue-400 to-blue-600" },
-    { id: "podcasts", name: "Podcasts", icon: FaPodcast, color: "bg-gradient-to-r from-purple-400 to-purple-600" },
-    { id: "settings", name: "Settings", icon: FaCog, color: theme.name === "dark" ? "bg-gray-600" : "bg-gray-400" },
-    { id: "trash", name: "Trash", icon: FaTrash, color: theme.name === "dark" ? "bg-gray-500" : "bg-gray-200" },
-  ]
+  useEffect(() => {
+    batchAddApps(AppList)
+  }, [Refresh, batchAddApps])
 
-  const getScale = (index) => {
-    if (hoveredApp === null) return 1
-    const distance = Math.abs(index - hoveredApp)
-    if (distance === 0) return 1.6
-    if (distance === 1) return 1.3
-    if (distance === 2) return 1.1
-    return 1
+  const handleResize = useCallback(() => {
+    if (resizeFrame.current) {
+      cancelAnimationFrame(resizeFrame.current)
+    }
+
+    resizeFrame.current = requestAnimationFrame(() => {
+      if (!dockRef.current) return
+
+      const viewportWidth = window.innerWidth / 2
+      const paddingX = 32
+      const gap = 8
+      const appItems = dockRef.current.querySelectorAll(".app-item")
+
+      if (!appItems.length) {
+        setVisibleAppsCount(apps.length)
+        return
+      }
+
+      const appItemWidth = appItems[0].offsetWidth
+      const maxWidth = viewportWidth - paddingX
+      const availableWidthPerApp = appItemWidth + gap
+
+      let maxN = Math.floor((maxWidth + gap) / availableWidthPerApp)
+      maxN = Math.max(1, Math.min(apps.length, maxN))
+
+      setVisibleAppsCount(maxN)
+    })
+  }, [apps.length])
+
+  useEffect(() => {
+    handleResize()
+
+    window.addEventListener("resize", handleResize)
+    window.addEventListener("keydown", handleResize)
+
+    const observer = new MutationObserver(handleResize)
+    if (dockRef.current) {
+      observer.observe(dockRef.current, { childList: true, subtree: true })
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize)
+      window.removeEventListener("keydown", handleResize)
+      observer.disconnect()
+      if (resizeFrame.current) {
+        cancelAnimationFrame(resizeFrame.current)
+      }
+    }
+  }, [handleResize])
+
+  useEffect(() => {
+    handleResize()
+  }, [apps, handleResize])
+
+  // Animation d'entrée pour le dock
+  const dockAnimation = {
+    hidden: { opacity: 0, y: 50 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: [0.22, 1, 0.36, 1],
+      },
+    },
   }
 
   return (
-    <div
-      className={`fixed bottom-2 left-1/2 transform -translate-x-1/2 ${
-        theme.name === "dark" 
-          ? "bg-gray-900 bg-opacity-70 border-gray-700" 
-          : "bg-white bg-opacity-20 border-white"
-      } backdrop-blur-lg border border-opacity-30 rounded-xl flex items-end justify-center z-50 shadow-lg transition-all duration-300 ease-in-out ${
-        hoveredApp !== null ? "h-20 px-5 py-3" : "h-16 px-4 py-2"
-      } md:h-18`}
+    <motion.div
+      className="fixed left-1/4 bottom-4 flex items-center justify-center space-x-4 z-50"
+      initial="hidden"
+      animate="show"
+      variants={dockAnimation}
     >
-      {dockApps.map((app, index) => {
-        const Icon = app.icon
-        return (
-          <div
-            key={app.id}
-            className="flex flex-col items-center group relative transition-all duration-300 ease-in-out"
-            onMouseEnter={() => setHoveredApp(index)}
-            onMouseLeave={() => setHoveredApp(null)}
-          >
-            <div
-              className={`relative rounded-lg p-1.5 shadow-md transition-all duration-300 ease-in-out ${app.color} flex items-center justify-center`}
-              style={{
-                transform: `scale(${getScale(index)})`,
-                margin: hoveredApp !== null ? "0 6px" : "0 4px",
-                zIndex: hoveredApp === index ? 10 : 1,
-              }}
-            >
-              <Icon className="h-6 w-6 md:h-8 md:w-8 text-white transition-all duration-300" />
-              {(app.id === "finder" || app.id === "messages") && (
-                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white rounded-full"></div>
-              )}
-            </div>
-
-            {/* Tooltip Nom de l'application */}
-            <div
-              className={`absolute -top-7 px-2 py-1 ${
-                theme.name === "dark" ? "bg-gray-700" : "bg-gray-800"
-              } text-white text-xs rounded transition-opacity duration-200 ${
-                hoveredApp === index ? "opacity-100" : "opacity-0 pointer-events-none"
-              }`}
-            >
-              {app.name}
-            </div>
+      {/* Barre gauche */}
+      <motion.div
+        ref={dockRef}
+        className={`flex flex-row justify-center items-center gap-2 min-h-[50px] px-2 ${
+          theme.name === "dark" ? "bg-gray-900/60 border-gray-700" : "bg-white/20 border-gray-200"
+        } backdrop-blur-xl border rounded-2xl shadow-xl z-50`}
+        layout
+      >
+        {loading ? (
+          <div className="flex items-center justify-center p-3">
+            <motion.div
+              className="w-5 h-5 border-3 border-blue-500 border-t-transparent rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+            />
           </div>
-        )
-      })}
-    </div>
+        ) : (
+          <AnimatePresence>
+            {apps.slice(0, visibleAppsCount / 2).map((app) => (
+              <AppIcon key={app.id} app={app} onClick={() => addWindow(app)} />
+            ))}
+          </AnimatePresence>
+        )}
+      </motion.div>
+
+      {/* Sphère au centre */}
+      <Sphere />
+
+      {/* Barre droite */}
+      <motion.div
+        className={`flex flex-row justify-center items-center gap-2 min-h-[50px] px-2 ${
+          theme.name === "dark" ? "bg-gray-900/60 border-gray-700" : "bg-white/20 border-gray-200"
+        } backdrop-blur-xl border rounded-2xl shadow-xl z-50`}
+        layout
+      >
+        {loading ? (
+          <div className="flex items-center justify-center p-3">
+            <motion.div
+              className="w-5 h-5 border-3 border-blue-500 border-t-transparent rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+            />
+          </div>
+        ) : (
+          <AnimatePresence>
+            {apps.slice(visibleAppsCount / 2, visibleAppsCount).map((app) => (
+              <AppIcon key={app.id} app={app} onClick={() => addWindow(app)} />
+            ))}
+          </AnimatePresence>
+        )}
+      </motion.div>
+    </motion.div>
   )
 }
 
 export default memo(Dock)
+

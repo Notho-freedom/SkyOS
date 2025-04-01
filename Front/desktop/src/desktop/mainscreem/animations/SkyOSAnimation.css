@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+:root {
+  --neon-blue: #00eaff;
+  --neon-purple: #8f00ff;
+  --neon-glow: rgba(0, 234, 255, 0.8);
+}
+
+.skyos-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+}
+
+.skyos-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 4rem;
+  letter-spacing: 0.3rem;
+  color: var(--neon-blue);
+  text-shadow: 0 0 10px var(--neon-glow), 0 0 20px var(--neon-purple);
+  animation: flicker 1.5s infinite alternate;
+  position: relative;
+}
+
+.skyos-title span {
+  display: inline-block;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Effet Warp aléatoire sur les lettres */
+.skyos-title span:nth-child(odd) {
+  animation: warp 3s infinite alternate ease-in-out;
+}
+.skyos-title span:nth-child(even) {
+  animation: warp 2.8s infinite alternate ease-in-out;
+}
+
+/* Effet Glitch */
+.glitch {
+  animation: glitch-text 0.15s infinite alternate;
+}
+
+.glitch span {
+  animation: glitch-letter 0.2s infinite alternate;
+}
+
+@keyframes glitch-text {
+  0% { text-shadow: 3px 3px var(--neon-purple), -3px -3px var(--neon-blue); }
+  100% { text-shadow: -3px -3px var(--neon-purple), 3px 3px var(--neon-blue); }
+}
+
+@keyframes glitch-letter {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+/* Effet Néon Flickering */
+@keyframes flicker {
+  0% { opacity: 1; text-shadow: 0 0 15px var(--neon-glow); }
+  50% { opacity: 0.8; text-shadow: 0 0 10px var(--neon-purple); }
+  100% { opacity: 1; text-shadow: 0 0 20px var(--neon-blue); }
+}
+
+/* Warp Spatial */
+@keyframes warp {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(2deg); }
+  100% { transform: scale(1) rotate(-2deg); }
+}

@@ -1,19 +1,22 @@
-// WindowManager.jsx
 import React from 'react';
 import WebViewWindow from './WebViewWindow';
-import { useApp } from './../AppContext';
+import Window from './Window';
+import { useWindowContext } from './WindowContext'; // Importer le hook personnalisé
 
 const WindowManager = () => {
-  const { windows, handleWindowAction } = useApp();
+  // Utilisation du contexte des fenêtres
+  const { windows } = useWindowContext();
 
   return (
     <>
       {windows.map(window => (
-        <WebViewWindow
-          key={window.id}
-          config={window}
-          onAction={handleWindowAction}
-        />
+        window.url ? (
+          <WebViewWindow key={window.id} config={window} />
+        ) : window.component ? (
+          <Window key={window.id} config={window}>
+            {React.createElement(window.component)}
+          </Window>
+        ) : null
       ))}
     </>
   );

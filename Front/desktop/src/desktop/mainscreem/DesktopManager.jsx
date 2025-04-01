@@ -1,11 +1,17 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import DesktopIcon from './DesktopIcon';
 import { useApp } from './../AppContext';
 import { useContextMenu } from "../contextual_menu/ContextMenuContext";
+import { useWindowContext } from '../window/WindowContext';
+import { useWebApps } from '../../Apps/AppManager';
+import IconGrid from './DesktopIcon';
+import db from './../../Apps/db';
+import SettingsApp from "../../components/settings/SettingsApp";
 
 const DesktopManager = () => {
-  const { desktopIcons, handleIconAction, createNewFolder } = useApp();
+  const { createNewFolder, bgRef } = useApp();
+  const { Refresh, setRefresh } = useWebApps();
   const { showContextMenu } = useContextMenu();
+  const { addApp } = useWindowContext();
   const desktopRef = useRef(null);
   const [desktopBounds, setDesktopBounds] = useState({
     width: 0,
@@ -13,7 +19,7 @@ const DesktopManager = () => {
     topOffset: 28,    // Hauteur de la TopBar
     bottomOffset: 70  // Hauteur de la Dock
   });
-  const [selectedIcon, setSelectedIcon] = useState(null);
+  
 
   const updateBounds = () => {
     if (desktopRef.current) {
@@ -26,79 +32,94 @@ const DesktopManager = () => {
     }
   };
 
-  const handleDesktopClick = () => {
-    setSelectedIcon(null); 
-  };
-
-  const handleIconSelect = (iconId) => {
-    setSelectedIcon(iconId);
-  };
-
-  function sortIcons(type){};
+  const refresh = () => {
+    db.clearDB();
+    bgRef.current?.refreshBackground();
+    //setRefresh(!Refresh);
+    
+  }
 
   const handleDesktopContextMenu = useCallback((e) => {
     e.preventDefault();
-
+    e.stopPropagation();
+  
     const menuItems = [
+      { label: 'actualisé', action: () => refresh() },
+      { separator: true },
       { 
         label: "Nouveau dossier", 
         action: () => createNewFolder("Nouveau dossier", { x: e.clientX, y: e.clientY })
       },
       { separator: true },
-      { label: "Actualiser le bureau", action: () => window.location.reload() },
+      { label: "Afficher les Images", action: () => addApp('Galerie') },
+      { label: "Changer le fond d'écran", action: () => bgRef.current?.refreshBackground() },
+      { label: "Enregistrer le fond d'écran", action: () => bgRef.current?.saveCurrentBackground() },
       { separator: true },
       { 
-        label: "Affichage", 
+        label: "Applications", 
         submenu: [
-          { label: "Trier par nom", action: () => sortIcons('name') },
-          { label: "Trier par date", action: () => sortIcons('date') },
-          { label: "Trier par type", action: () => sortIcons('type') },
+          { label: "Lancer une application" },
+          { label: "Ouvrir dans une fenêtre flottante" },
+          { label: "Organiser les applications ouvertes" },
           { separator: true },
-          { label: "Nettoyer" }
+          { label: "Afficher dans un autre bureau virtuel" }
         ] 
       },
       { 
-        label: "Options", 
+        label: "Fichiers", 
         submenu: [
-          { label: "Paramètres d'affichage" },
-          { label: "Personnaliser" }
+          { label: "Déplacer vers le cloud" },
+          { label: "Synchroniser avec un autre appareil" },
+          { label: "Vérifier l'intégrité des fichiers" },
+          { separator: true },
+          { label: "Partager avec le réseau SkyOS" }
+        ] 
+      },
+      { separator: true },
+      { 
+        label: "Personnalisation", 
+        submenu: [
+          { label: "Changer le thème" },
+          { label: "Personnaliser la barre de tâches" },
+          { label: "Organiser les icônes automatiquement" },
+          { label: "Afficher la météo" },
+          { label: "Afficher le calendrier" }
+        ] 
+      },
+      { separator: true },
+      { 
+        label: "Sécurité et Sauvegarde", 
+        submenu: [
+          { label: "Activer la sauvegarde automatique" },
+          { label: "Restaurer le bureau" },
+          { separator: true },
+          { label: "Protéger avec un mot de passe" }
+        ] 
+      },
+      { separator: true },
+      { 
+        label: "Cloud", 
+        submenu: [
+          { label: "Accéder aux fichiers du cloud" },
+          { label: "Synchroniser avec un autre compte" },
+          { label: "Envoyer des fichiers vers le cloud" }
+        ] 
+      },
+      { separator: true },
+      { label: "Paramètres", action: () => addApp('Paramètres') },
+      { 
+        label: "Paramètres avancés", 
+        submenu: [
+          { label: "Activer le mode développeur" },
+          { label: "Accéder aux logs du système" },
+          { label: "Moniteur des ressources" }
         ] 
       }
     ];
-
+  
     showContextMenu(menuItems, { x: e.clientX, y: e.clientY });
   }, [createNewFolder, showContextMenu]);
-
-  const handleIconContextMenu = useCallback((e, icon) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const menuItems = [
-      { label: "Ouvrir", action: () => handleIconAction(icon.id, 'open') },
-      { label: "Renommer", action: () => handleIconAction(icon.id, 'rename') },
-      { separator: true },
-      { label: "Copier" },
-      { label: "Couper" },
-      { label: "Coller", disabled: true },
-      { separator: true },
-      { 
-        label: "Partager", 
-        submenu: [
-          { label: "AirDrop" },
-          { label: "Email" },
-          { label: "Messages" }
-        ] 
-      },
-      { separator: true },
-      { 
-        label: "Supprimer", 
-        action: () => handleIconAction(icon.id, 'delete'),
-        className: "text-red-500 hover:text-white hover:bg-red-500"
-      }
-    ];
-
-    showContextMenu(menuItems, { x: e.clientX, y: e.clientY });
-  }, [handleIconAction, showContextMenu]);
+  
 
   useEffect(() => {
     updateBounds();
@@ -114,20 +135,10 @@ const DesktopManager = () => {
         top: `${desktopBounds.topOffset}px`,
         height: `calc(100% - ${desktopBounds.topOffset + desktopBounds.bottomOffset}px)`
       }}
-      onClick={handleDesktopClick}
       onContextMenu={handleDesktopContextMenu}
     >
-      {desktopIcons.map(icon => (
-        <DesktopIcon
-          key={icon.id}
-          {...icon}
-          desktopBounds={desktopBounds}
-          isSelected={selectedIcon === icon.id}
-          onSelect={handleIconSelect}
-          onAction={(action) => handleIconAction(icon.id, action)}
-          onContextMenu={(e) => handleIconContextMenu(e, icon)}
-        />
-      ))}
+        <IconGrid/>
+
     </div>
   );
 };

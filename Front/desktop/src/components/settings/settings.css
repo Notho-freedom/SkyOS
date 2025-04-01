@@ -1,0 +1,39 @@
+/* Additional styles for the settings window */
+.settings-window {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+  }
+  
+  .settings-icon {
+    transition: transform 0.2s ease;
+  }
+  
+  .settings-icon:hover {
+    transform: scale(1.05);
+  }
+  
+  .settings-search {
+    background-color: rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+  }
+  
+  .settings-tab {
+    transition: background-color 0.2s ease;
+  }
+  
+  .settings-tab.active {
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Smooth animations for hover states */
+  .settings-item {
+    transition: all 0.2s ease;
+  }
+  
+  .settings-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+  }
+  
+  

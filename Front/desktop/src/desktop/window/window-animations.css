@@ -1,0 +1,155 @@
+/* Add this to your global CSS file */
+@keyframes windowAppear {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* Window entrance animation */
+  @keyframes windowScaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* Window close animation */
+  @keyframes windowScaleOut {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+  }
+  
+  /* Window minimize animation */
+  @keyframes windowMinimize {
+    from {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.5) translateY(100px);
+    }
+  }
+  
+  /* Window unminimize animation */
+  @keyframes windowUnminimize {
+    from {
+      opacity: 0;
+      transform: scale(0.5) translateY(100px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  
+  /* Window maximize animation */
+  @keyframes windowMaximize {
+    from {
+      border-radius: 12px;
+    }
+    to {
+      border-radius: 0;
+    }
+  }
+  
+  /* Window unmaximize animation */
+  @keyframes windowUnmaximize {
+    from {
+      border-radius: 0;
+    }
+    to {
+      border-radius: 12px;
+    }
+  }
+  
+  .window-container {
+    animation: windowAppear 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+  }
+  
+  .window-container.maximized {
+    border-radius: 0 !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  /* Glass effect for modern macOS look */
+  .backdrop-blur-xl {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  /* Subtle window shadow */
+  .window-shadow {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Dark mode window shadow */
+  .dark .window-shadow {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2), 0 0 0 1px
+      rgba(255, 255, 255, 0.05);
+  }
+  
+  /* Apply animations based on window state */
+  .window-container[data-animation="scale-in"] {
+    animation: windowScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .window-container[data-animation="close"] {
+    animation: windowScaleOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    pointer-events: none;
+  }
+  
+  .window-container[data-animation="minimize"] {
+    animation: windowMinimize 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    pointer-events: none;
+  }
+  
+  .window-container[data-animation="unminimize"] {
+    animation: windowUnminimize 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .window-container[data-animation="maximize"] {
+    animation: windowMaximize 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .window-container[data-animation="unmaximize"] {
+    animation: windowUnmaximize 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  /* Active window styling */
+  .window-container[data-active="true"] .window-header {
+    background: linear-gradient(to right, rgba(220, 220, 220, 0.95), rgba(240, 240, 240, 0.95));
+  }
+  
+  .dark .window-container[data-active="true"] .window-header {
+    background: linear-gradient(to right, rgba(50, 50, 50, 0.95), rgba(40, 40, 40, 0.95));
+  }
+  
+  .window-container[data-active="false"] .window-header {
+    background: linear-gradient(to right, rgba(200, 200, 200, 0.8), rgba(220, 220, 220, 0.8));
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .dark .window-container[data-active="false"] .window-header {
+    background: linear-gradient(to right, rgba(60, 60, 60, 0.8), rgba(50, 50, 50, 0.8));
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+
+  
