@@ -10,6 +10,7 @@ import DesktopManager from './desktop/mainscreem/DesktopManager';
 import WindowManager from './desktop/window/WindowManager';
 import { ThemeProvider } from "./theme/ThemeContext"
 import { ContextMenuProvider } from "./desktop/contextual_menu/ContextMenuContext";
+import { Toaster } from "sonner";
 
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
         <ContextMenuProvider>
             <Suspense fallback={<div>{t("loading")}</div>}>
               <DesktopBackground ref={bgRef}>
+                <Toaster position="top-right" richColors closeButton />
                 <TopBar />
                 <Dock />
                 <DesktopManager />
