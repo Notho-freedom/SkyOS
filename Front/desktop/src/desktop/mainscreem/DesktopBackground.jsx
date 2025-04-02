@@ -18,91 +18,108 @@ const blobToDataURL = (blob) =>
     reader.readAsDataURL(blob);
   });
 
-const DesktopBackground = forwardRef(({
-  children,
-  width = window.innerWidth,
-  height = window.innerHeight
-}, ref) => {
-  const [currentBg, setCurrentBg] = useState(null);
-  const [nextBg, setNextBg] = useState(null);
-  const [loading, setLoading] = useState(true); // État de chargement des images
-  const [imageLoaded, setImageLoaded] = useState(false); // Gère l'état de chargement de l'image
-  const API_KEY = 'eDfjR7DwNjtup2rMR4B4fQ==yzwNblaGbUAgT1MQ';
-
-  //['nature', 'city', 'technology', 'food','still_life', 'abstract', 'wildlife']
-  const categories = useMemo(() => [
-    'nature', 'city', 'technology'
-  ], []);
-
-  const fetchRandomImage = useCallback(async () => {
-    try {
-      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-      const url = new URL('https://api.api-ninjas.com/v1/randomimage');
-      url.searchParams.append('category', randomCategory);
-      url.searchParams.append('width', Math.max(1600, width));
-      url.searchParams.append('height', Math.max(900, height));
-
-      const response = await fetch(url, {
-        headers: {
-          'X-Api-Key': API_KEY,
-          'Accept': 'image/jpg'
-        }
-      });
-      if (!response.ok) throw new Error(`Erreur HTTP! statut: ${response.status}`);
-      
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
-    } catch (error) {
-      showNotification('Erreur de récupération de l’image en ligne',error,'error' );
-      console.error('Erreur de récupération de l’image en ligne:', error);
-      return null;
-    }
-  }, [width, height, API_KEY, categories]);
-
-  const refreshBackground = useCallback(async () => {
-    showNotification('Systeme', "Arriere plan charger", 'success');
-    setLoading(true);
-    setImageLoaded(false);
-    
-    try {
-      const newBg = await fetchRandomImage();
-      if (!newBg) {
+  const DesktopBackground = forwardRef(({
+    children,
+    width = window.innerWidth,
+    height = window.innerHeight
+  }, ref) => {
+    const [currentBg, setCurrentBg] = useState(null);
+    const [nextBg, setNextBg] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const API_KEY = 'eDfjR7DwNjtup2rMR4B4fQ==yzwNblaGbUAgT1MQ';
+  
+    const categories = useMemo(() => ['nature', 'city', 'technology'], []);
+  
+    const loadFallbackImage = useCallback(async () => {
+      try {
         const savedBackgrounds = await db.getAllBackgrounds();
         if (savedBackgrounds.length > 0) {
           const fallback = savedBackgrounds[Math.floor(Math.random() * savedBackgrounds.length)].dataUrl;
+          console.log(fallback);
           setCurrentBg(fallback);
+          setNextBg(fallback);
+          showNotification('Fond d\'écran', 'Chargement d\'une image sauvegardée', 'info');
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error('Erreur lors du chargement des images sauvegardées:', error);
+        return false;
+      }
+    }, []);
+  
+    const fetchRandomImage = useCallback(async () => {
+      try {
+        const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+        const url = new URL('https://api.api-ninjas.com/v1/randomimage');
+        url.searchParams.append('category', randomCategory);
+        url.searchParams.append('width', Math.max(1600, width));
+        url.searchParams.append('height', Math.max(900, height));
+  
+        const response = await fetch(url, {
+          headers: {
+            'X-Api-Key': API_KEY,
+            'Accept': 'image/jpeg'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP! statut: ${response.status}`);
+        }
+        
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+      } catch (error) {
+        console.error('Erreur de récupération de l\'image en ligne:', error);
+        
+        // Essayer de charger une image sauvegardée
+        const hasFallback = await loadFallbackImage();
+        
+        if (!hasFallback) {
+          showNotification(
+            'Erreur de récupération', 
+            'Impossible de charger une image (en ligne ou sauvegardée)', 
+            'error'
+          );
+        }
+        
+        return null;
+      }
+    }, [width, height, API_KEY, categories, loadFallbackImage]);
+  
+    const refreshBackground = useCallback(async () => {
+      setLoading(true);
+      setImageLoaded(false);
+      
+      try {
+        const newBg = await fetchRandomImage();
+        if (!newBg) {
           setLoading(false);
           return;
         }
-        setLoading(false);
-        return;
-      }
   
-      // Sauvegarder l'image avant de la définir comme fond d'écran
-      const savedBackgrounds = await db.getAllBackgrounds();
-      if (savedBackgrounds.length === 0) {
-        try {
-          const response = await fetch(newBg);
-          const blob = await response.blob();
-          const dataUrl = await blobToDataURL(blob);
-          
-          // Sauvegarde de l'image dans IndexedDB
-          await db.addBackground(dataUrl);
-          showNotification('Arrire Plan', "Fond d'écran sauvegardé dans IndexedDB.", 'success');
-          console.log("Fond d'écran sauvegardé dans IndexedDB.");
-        } catch (err) {
-          console.error("Erreur lors de la sauvegarde dans IndexedDB :", err);
+        // Sauvegarder la nouvelle image si c'est la première
+        const savedBackgrounds = await db.getAllBackgrounds();
+        if (savedBackgrounds.length === 0) {
+          try {
+            const response = await fetch(newBg);
+            const blob = await response.blob();
+            const dataUrl = await blobToDataURL(blob);
+            await db.addBackground(dataUrl);
+            showNotification('Sauvegarde', 'Nouveau fond d\'écran sauvegardé', 'success');
+          } catch (err) {
+            console.error("Erreur lors de la sauvegarde:", err);
+          }
         }
-      }
   
-      setNextBg(newBg);
-      setImageLoaded(false);
-    } catch (error) {
-      showNotification('Erreur', 'Erreur de rafraîchissement.', 'error');
-      console.error('Erreur de rafraîchissement:', error);
-      setLoading(false);
-    }
-  }, [fetchRandomImage]);
+        setNextBg(newBg);
+      } catch (error) {
+        console.error('Erreur de rafraîchissement:', error);
+        showNotification('Erreur', 'Problème lors du rafraîchissement', 'error');
+        setLoading(false);
+      }
+    }, [fetchRandomImage]);
   
   const saveCurrentBackground = useCallback(async () => {
     if (!currentBg) return;

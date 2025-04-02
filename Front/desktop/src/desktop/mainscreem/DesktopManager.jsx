@@ -2,14 +2,13 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useApp } from './../AppContext';
 import { useContextMenu } from "../contextual_menu/ContextMenuContext";
 import { useWindowContext } from '../window/WindowContext';
-import { useWebApps } from '../../Apps/AppManager';
+//import { useWebApps } from '../../Apps/AppManager';
 import IconGrid from './DesktopIcon';
 import db from './../../Apps/db';
-import SettingsApp from "../../components/settings/SettingsApp";
 
 const DesktopManager = () => {
   const { createNewFolder, bgRef } = useApp();
-  const { Refresh, setRefresh } = useWebApps();
+  //const { Refresh, setRefresh } = useWebApps();
   const { showContextMenu } = useContextMenu();
   const { addApp } = useWindowContext();
   const desktopRef = useRef(null);

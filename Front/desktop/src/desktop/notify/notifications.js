@@ -23,12 +23,16 @@ const icons = {
   warning: <AlertTriangle className="text-yellow-500 w-6 h-6" />,
 };
 
-// Fonction pour jouer un son
 const playSound = (type) => {
-  const sound = new Audio(sounds[type]);
-  sound.currentTime = 0;
-  sound.play();
+  try {
+    const sound = new Audio(sounds[type]);
+    sound.currentTime = 0;
+    sound.play().catch(() => {}); // Silently ignore autoplay errors
+  } catch (error) {
+    console.error("Error playing sound:", error);
+  }
 };
+
 
 // Fonction pour afficher la notification
 export const showNotification = (title, message, type = "info") => {
