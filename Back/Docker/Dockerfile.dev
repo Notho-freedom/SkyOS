@@ -1,0 +1,26 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install deps
+RUN apt-get update && apt-get install -y \
+  wget gnupg ca-certificates \
+  curl \
+  x11-xserver-utils \
+  xvfb \
+  libgtk-3-0 libx11-xcb1 libnss3 libxss1 libasound2t6 \
+  fonts-liberation libappindicator3-1 libxrandr2 libxcomposite1 libxdamage1 libgbm1 libxshmfence1 \
+  --no-install-recommends && \
+  rm -rf /var/lib/apt/lists/*
+
+# Chromium without snap
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+  apt-get update && \
+  apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+  rm google-chrome-stable_current_amd64.deb
+
+# Script de démarrage
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]

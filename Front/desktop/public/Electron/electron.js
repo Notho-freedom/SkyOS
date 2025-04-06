@@ -23,7 +23,9 @@ app.whenReady().then(() => {
   mainWindow.setMenu(null);
 });
 
-
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
+app.commandLine.appendSwitch('enable-accelerated-2d-canvas');
+app.commandLine.appendSwitch('enable-webgl');
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

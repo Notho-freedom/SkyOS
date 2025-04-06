@@ -8,7 +8,7 @@ import AppList from "../../Apps/AppWeb"
 import { useWindowContext } from "../window/WindowContext"
 
 // Composant de la sphère centrale avec animation
-const Sphere = () => {
+const Sphere = ({action}) => {
   return (
     <motion.div
       className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 via-purple-400 to-blue-300 z-50 flex justify-center items-center shadow-lg"
@@ -22,6 +22,8 @@ const Sphere = () => {
         repeat: Number.POSITIVE_INFINITY,
         ease: "easeInOut",
       }}
+      onClick={action}
+      title="MAX IA"
     >
       <motion.div
         className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md"
@@ -81,7 +83,7 @@ const Dock = () => {
   const [visibleAppsCount, setVisibleAppsCount] = useState(apps.length)
   const dockRef = useRef(null)
   const resizeFrame = useRef(null)
-  const { addWindow } = useWindowContext()
+  const { addWindow, addApp } = useWindowContext()
 
   useEffect(() => {
     batchAddApps(AppList)
@@ -187,7 +189,7 @@ const Dock = () => {
       </motion.div>
 
       {/* Sphère au centre */}
-      <Sphere />
+      <Sphere action={()=>addApp('Chatbot')} />
 
       {/* Barre droite */}
       <motion.div
