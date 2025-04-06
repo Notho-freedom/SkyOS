@@ -53,8 +53,8 @@ const AppList = [
   "https://www.tumblr.com/",
   "https://www.threads.net/", // Threads (Meta)
   "https://www.wechat.com/", // WeChat
-  "https://www.telegram.org/", // Telegram
-  "https://www.whatsapp.com/", // WhatsApp
+  "https://www.web.telegram.org/", // Telegram
+  "https://www.web.whatsapp.com/", // WhatsApp
   "https://www.mastodon.social/", // Mastodon
   "https://www.vero.co/", // Vero
   "https://www.clubhouse.com/", // Clubhouse
@@ -65,6 +65,8 @@ const AppList = [
   // Autres outils utiles
   "https://www.weather.com/",
   "https://www.zapier.com/",
+  "https://skyos.onrender.com/",
+  "http://windows-live.genesis-company.net/",
 ];
 
 export default AppList;
