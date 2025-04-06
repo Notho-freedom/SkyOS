@@ -9,6 +9,7 @@ import React, {
 import PropTypes from 'prop-types';
 import db from './db/backgroundsDb'; // IndexedDB via Dexie
 import { showNotification } from '../notify/notifications';
+import fallback from "./fallback/fallback.jpeg";
 
 const blobToDataURL = (blob) =>
   new Promise((resolve, reject) => {
@@ -84,7 +85,13 @@ const blobToDataURL = (blob) =>
           );
         }
         
-        return null;
+        showNotification(
+          'FallBack', 
+          'FallBack...', 
+          'info'
+        );
+
+        return fallback;
       }
     }, [width, height, API_KEY, categories, loadFallbackImage]);
   
