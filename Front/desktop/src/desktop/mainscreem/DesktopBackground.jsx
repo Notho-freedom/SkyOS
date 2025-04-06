@@ -83,15 +83,18 @@ const blobToDataURL = (blob) =>
             'Impossible de charger une image (en ligne ou sauvegardée)', 
             'error'
           );
-        }
-        
-        showNotification(
-          'FallBack', 
-          'FallBack...', 
-          'info'
-        );
 
-        return fallback;
+        
+          showNotification(
+            'FallBack', 
+            'FallBack...', 
+            'info'
+          );
+  
+          return fallback;
+        }
+
+        return null;
       }
     }, [width, height, API_KEY, categories, loadFallbackImage]);
   

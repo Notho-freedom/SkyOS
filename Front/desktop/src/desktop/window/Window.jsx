@@ -56,8 +56,8 @@ const Window = ({ config, children }) => {
     <Rnd
       size={windowState.size}
       position={windowState.position}
-      minWidth={300}
-      minHeight={200}
+      minWidth={1200}
+      minHeight={800}
       bounds="parent"
       disableDragging={windowState.maximized}
       onMouseDown={handleFocus} // Appel du handleFocus

@@ -34,7 +34,7 @@ export const WindowProvider = ({ children }) => {
       minimized: false,
       maximized: false,
       position: config.position || { x: newPositionX, y: newPositionY },
-      size: config.size || { width: 350, height: 300 },
+      size: config.size || { width: 1200, height: 800 },
     };
     setWindows(prevWindows => [...prevWindows, newWindow]);
   }, [windows]);
