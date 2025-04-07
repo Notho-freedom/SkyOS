@@ -23,6 +23,7 @@ const GroqMegaAI = ({ userPreferredModel }) => {
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
+  const [shouldShowResponse, setShouldShowResponse] = useState(false);
 
   // Gestion de la reconnaissance vocale
   const { transcript, resetTranscript } = useSpeechRecognition();
@@ -48,6 +49,34 @@ const GroqMegaAI = ({ userPreferredModel }) => {
     fetchModels();
   }, [userPreferredModel]);
 
+  // Fonction pour analyser le message et choisir le modèle
+  const chooseModelBasedOnMessage = (inputMessage) => {
+    if (inputMessage.includes("analyse")) {
+      return models.find(m => m.includes("analyser")); // Par exemple, un modèle spécifique pour l'analyse
+    } else if (inputMessage.includes("création") || inputMessage.includes("développement")) {
+      return models.find(m => m.includes("créatif")); // Modèle pour la création ou développement
+    } else if (inputMessage.includes("résumé")) {
+      return models.find(m => m.includes("résumé")); // Modèle pour le résumé de texte
+    } else {
+      return currentModel; // Utiliser le modèle actuel par défaut
+    }
+  };
+
+// Fonction pour supprimer les balises <think>...</think> et leur contenu
+const removeThinkTags = (text) => {
+  return text.replace(/<think>.*?<\/think>/gs, '');
+};
+
+
+  // Fonction pour changer automatiquement de modèle selon les critères
+  const autoSwitchModel = (chatResponse, inputMessage) => {
+    const nextModel = chooseModelBasedOnMessage(inputMessage);
+    if (nextModel && nextModel !== currentModel) {
+      setCurrentModel(nextModel);
+      setResponse(`🔄 Modèle basculé automatiquement vers: ${nextModel}`);
+    }
+  };
+
   // Envoi du prompt à l'IA
   const sendPrompt = async (inputMessage) => {
     if (!inputMessage || !currentModel) return;
@@ -60,12 +89,17 @@ const GroqMegaAI = ({ userPreferredModel }) => {
         messages: [{ role: "user", content: inputMessage }],
       });
 
-      const text = chatResponse.choices?.[0]?.message?.content || "🤖 Pas de réponse.";
+      let text = chatResponse.choices?.[0]?.message?.content || "🤖 Pas de réponse.";
+      text = removeThinkTags(text); // Enlever les balises <think>...</think>
+
       setResponse(text);
       saveMemory(inputMessage, text); // Sauvegarder dans la mémoire locale
 
+      // Vérifier si on doit basculer le modèle en fonction de la requête
+      autoSwitchModel(text, inputMessage);
+
       // Demander au serveur de générer l'audio
-      const responseAudio = await fetch('http://localhost:3030/generate-audio', {
+      const responseAudio = await fetch('https://low-tts.onrender.com/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text })
@@ -81,6 +115,13 @@ const GroqMegaAI = ({ userPreferredModel }) => {
       } else {
         console.error("Erreur lors de la génération audio : ", responseAudio.status);
         setResponse("🚨 Erreur lors de la génération de l'audio.");
+      }
+
+      // Décider si on affiche la réponse texte
+      if (inputMessage.toLowerCase().includes("afficher la réponse")) {
+        setShouldShowResponse(true);
+      } else {
+        setShouldShowResponse(false);
       }
 
     } catch (err) {
@@ -119,15 +160,15 @@ const GroqMegaAI = ({ userPreferredModel }) => {
 
   return (
     <div className="p-4 text-white bg-gray-900 rounded">
-      <h3 className="font-bold mb-2">🧠 IA Groq – Modèle: <span className="text-green-400">{currentModel}</span></h3>
+      <h3 className="mb-2 font-bold">🧠 IA Groq – Modèle: <span className="text-green-400">{currentModel}</span></h3>
 
       <textarea
         placeholder="Parle avec SkyOS..."
         value={transcript || message} // Utilisation de transcript si disponible
         onChange={e => setMessage(e.target.value)}
-        className="w-full p-2 rounded bg-gray-800 text-white mb-2"
+        className="w-full p-2 mb-2 text-white bg-gray-800 rounded"
       />
-      <button onClick={() => sendPrompt(message)} disabled={loading} className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+      <button onClick={() => sendPrompt(message)} disabled={loading} className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">
         Envoyer
       </button>
 
@@ -139,12 +180,14 @@ const GroqMegaAI = ({ userPreferredModel }) => {
       </div>
 
       <div className="mt-2">
-        <button onClick={switchModel} className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded">
+        <button onClick={switchModel} className="px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-700">
           🔄 Changer de modèle
         </button>
       </div>
 
-      <pre className="mt-4 bg-gray-800 p-3 rounded max-h-64 overflow-auto">{response}</pre>
+      {shouldShowResponse && (
+        <pre className="p-3 mt-4 overflow-auto bg-gray-800 rounded max-h-64">{response}</pre>
+      )}
     </div>
   );
 };

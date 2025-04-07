@@ -1,49 +1,87 @@
 import requests
-import io
 import pygame
-import edge_tts
-import asyncio
+import io
+import json
 
-# Fonction pour lister les voix et filtrer celles qui sont féminines et en français
-async def list_french_female_voices():
-    voices = await edge_tts.list_voices()
-    # Filtrer les voix féminines en français
-    female_french_voices = [voice for voice in voices if 'fr-' in voice['Locale'] and voice['Gender'] == 'Female']
-    return female_french_voices
+# URL de ton serveur FastAPI (change en fonction de ton adresse)
+base_url = "https://low-tts.onrender.com"  # Changez cette ligne si nécessaire
 
-# Fonction pour tester chaque voix féminine française
-async def test_french_female_voices():
-    female_french_voices = await list_french_female_voices()
-    
-    for voice in female_french_voices:
-        print(f"Testing voice: {voice['Name']}")
-        # URL de ton serveur FastAPI
-        url = "http://127.0.0.1:8000/api/tts"
+# 1. Test de la route /api/status
+def test_status():
+    response = requests.get(f"{base_url}/api/status")
+    if response.status_code == 200:
+        print("Status OK: ", response.json())
+    else:
+        print(f"Erreur lors de la récupération du statut: {response.status_code}, {response.text}")
 
-        # Le texte à convertir en audio
-        text = "Bonjour, voici un test de la synthèse vocale avec Edge TTS sur SkyOS."
+# 2. Test de la route /api/tts
+def test_tts():
+    text = "Bonjour, ceci est un test de synthèse vocale avec le serveur FastAPI."
+    payload = {"text": text, "voice": "fr-FR-DeniseNeural"}  # Voix par défaut ou à modifier selon ton test
 
-        # Paramètres de la requête
-        payload = {"text": text, "voice": voice['Name']}  # Utiliser le nom de la voix
+    response = requests.post(f"{base_url}/api/tts", json=payload)
 
-        # Envoyer la requête POST pour récupérer l'audio
-        response = requests.post(url, json=payload)
+    if response.status_code == 200:
+        print("TTS généré avec succès!")
+        audio_stream = io.BytesIO(response.content)
 
-        # Vérifier si la requête a réussi
-        if response.status_code == 200:
-            print(f"TTS généré avec succès pour {voice['Name']}!")
-            audio_stream = io.BytesIO(response.content)
-            
-            # Initialiser Pygame pour jouer l'audio
-            pygame.mixer.init()
-            pygame.mixer.music.load(audio_stream)
-            pygame.mixer.music.play()
-            
-            # Attendre que l'audio soit fini
-            while pygame.mixer.music.get_busy():
-                pygame.time.Clock().tick(10)
-        else:
-            print(f"Erreur lors de la génération TTS pour {voice['Name']}: {response.status_code}")
+        # Initialiser Pygame pour jouer l'audio
+        pygame.mixer.init()
+        pygame.mixer.music.load(audio_stream)
+        pygame.mixer.music.play()
 
-# Exécuter la fonction pour tester toutes les voix féminines françaises
-asyncio.run(test_french_female_voices())
+        while pygame.mixer.music.get_busy():
+            pygame.time.Clock().tick(10)
+
+    else:
+        print(f"Erreur lors de la génération TTS: {response.status_code}, {response.text}")
+
+# 3. Test de la route /api/voices
+def test_voices():
+    response = requests.get(f"{base_url}/api/voices")
+    if response.status_code == 200:
+        print("Voices disponibles: ", response.json())
+    else:
+        print(f"Erreur lors de la récupération des voix: {response.status_code}, {response.text}")
+
+# 4. Test de la route /api/check-voice/{voice_name}
+def test_check_voice():
+    voice_name = "fr-FR-DeniseNeural"
+    response = requests.get(f"{base_url}/api/check-voice/{voice_name}")
+    if response.status_code == 200:
+        print(f"Disponibilité de la voix {voice_name}: ", response.json())
+    else:
+        print(f"Erreur lors de la vérification de la voix {voice_name}: {response.status_code}, {response.text}")
+
+# 5. Test de la route /api/voices-by-text
+def test_voices_by_text():
+    text = "Je voudrais savoir quelles voix sont disponibles."
+    payload = {"text": text}
+    response = requests.get(f"{base_url}/api/voices-by-text", json=payload)
+
+    if response.status_code == 200:
+        print(f"Voix disponibles pour le texte '{text[:30]}...': ", response.json())
+    else:
+        print(f"Erreur lors de la récupération des voix pour le texte: {response.status_code}, {response.text}")
+
+# 6. Test de la route /api/voices-by-language/{language_code}
+def test_voices_by_language():
+    language_code = "fr"  # Tester pour le français
+    response = requests.get(f"{base_url}/api/voices-by-language/{language_code}")
+
+    if response.status_code == 200:
+        print(f"Voix disponibles pour la langue {language_code}: ", response.json())
+    else:
+        print(f"Erreur lors de la récupération des voix pour {language_code}: {response.status_code}, {response.text}")
+
+# Exécution de tous les tests
+def run_tests():
+    test_status()
+    test_tts()
+    test_voices()
+    test_check_voice()
+    test_voices_by_text()
+    test_voices_by_language()
+
+if __name__ == "__main__":
+    run_tests()
