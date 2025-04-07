@@ -17,14 +17,14 @@ app.whenReady().then(() => {
       preload: path.join(__dirname, "preload.js"),  // Charger un fichier préchargeant pour le processus renderer
       webSecurity: false,  // Désactiver la politique de sécurité de même origine (utile pour les apps locales, mais attention aux risques)
       allowRunningInsecureContent: true,  // Permet l'exécution de contenu non sécurisé (utile pour du dev ou certaines apps)
-      nodeIntegration: false,  // Sécurité : évite l'accès aux API Node.js dans le renderer (ne jamais activer en prod !)
+      nodeIntegration: true,  // Sécurité : évite l'accès aux API Node.js dans le renderer (ne jamais activer en prod !)
       contextIsolation: true,  // Sécurise le renderer en isolant son contexte
       webviewTag: true,  // Permet d'utiliser <webview> dans le HTML (si nécessaire)
     },
   });
 
   // Charge ton app React (ici un exemple avec une URL externe)
-  mainWindow.loadURL("https://skyos.onrender.com/");
+  mainWindow.loadURL("http://localhost:3000/");
 
   // Quand la page est prête, on l'affiche
   mainWindow.once('ready-to-show', () => {
@@ -36,6 +36,9 @@ app.whenReady().then(() => {
 
   // Désactiver la redimension du contenu (le faire en fullscreen)
   mainWindow.setResizable(false);
+
+  // Assurer que les fenêtres restent toujours sur l'écran principal
+  mainWindow.setBounds({ x: 0, y: 0, width: 1280, height: 800 });
 });
 
 // Configurations GPU pour les performances

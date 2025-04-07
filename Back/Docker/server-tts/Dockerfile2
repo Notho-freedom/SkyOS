@@ -1,0 +1,2 @@
+FROM ghcr.io/rhasspy/piper-tts-server:latest
+CMD ["--model", "fr_FR-siwis-low"]
