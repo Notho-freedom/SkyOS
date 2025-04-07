@@ -2,6 +2,7 @@ import os
 import asyncio
 from io import BytesIO
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
 import edge_tts
 import logging
@@ -12,6 +13,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+# Configuration CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permet toutes les origines
+    allow_credentials=True,
+    allow_methods=["*"],  # Permet toutes les méthodes HTTP (GET, POST, etc.)
+    allow_headers=["*"],  # Permet tous les en-têtes
+)
 
 @app.post("/api/tts")
 async def generate_tts(request: Request):
