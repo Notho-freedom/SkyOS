@@ -1,39 +1,17 @@
-# Étape 1 - Build
-FROM python:3.9-slim as builder
+# Utiliser l'image officielle Python comme base
+FROM python:3.11-slim
 
-WORKDIR /app
-COPY requirements.txt .
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc python3-dev && \
-    pip install --user -r requirements.txt
-
-# Étape 2 - Runtime
-FROM python:3.9-slim
-
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Install runtime dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    ffmpeg \
-    libsm6 \
-    libxext6 \
-    && rm -rf /var/lib/apt/lists/*
+# Copier les fichiers du projet dans le conteneur
+COPY . /app
 
-# Copy from builder
-COPY --from=builder /root/.local /root/.local
-COPY . .
+# Installer les dépendances requises
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Ensure scripts in .local are usable
-ENV PATH=/root/.local/bin:$PATH
+# Exposer le port que FastAPI utilise (par défaut 8000)
+EXPOSE 8000
 
-# Optimisation pour FastAPI
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PORT=8000
-
-EXPOSE ${PORT}
-
-# Commande de démarrage avec Gunicorn
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "app:app"]
+# Commande pour démarrer le serveur FastAPI avec Uvicorn
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

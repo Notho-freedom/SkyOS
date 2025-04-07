@@ -1,83 +1,148 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
-from gtts import gTTS
-from datetime import datetime
-import io
+import os
+import asyncio
+from io import BytesIO
+from fastapi import FastAPI, Request
+from fastapi.responses import StreamingResponse, JSONResponse
+import edge_tts
 import logging
-from langdetect import detect, LangDetectException
-from pydub import AudioSegment
+import uvicorn
+from langdetect import detect  # Ajoute cette importation pour détecter la langue
 
-app = FastAPI()
-
-# Configuration CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["POST"],
-    allow_headers=["*"],
-)
-
-# Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class TTSService:
-    @staticmethod
-    def detect_language(text: str) -> str:
-        try:
-            lang = detect(text)
-            logger.info(f"Detected language: {lang}")
-            return lang
-        except LangDetectException as e:
-            logger.warning(f"Language detection failed, defaulting to 'en': {str(e)}")
-            return "en"  # Fallback à l'anglais
-
-    async def generate_tts(self, text: str, lang: str = None):
-        try:
-            # Détection automatique si langue non spécifiée
-            target_lang = lang if lang else self.detect_language(text)
-            
-            # Validation de la langue (gTTS supporte environ 40 langues)
-            if len(target_lang) != 2:
-                raise ValueError("Langue non supportée (code à 2 lettres requis)")
-
-            # Génération TTS en mémoire
-            tts = gTTS(text=text, lang=target_lang)
-            audio_buffer = io.BytesIO()
-            tts.write_to_fp(audio_buffer)
-            audio_buffer.seek(0)
-
-            # Conversion en format universel
-            audio = AudioSegment.from_mp3(audio_buffer)
-            web_audio = io.BytesIO()
-            audio.export(web_audio, format="mp3")
-            web_audio.seek(0)
-
-            return web_audio, target_lang
-
-        except Exception as e:
-            logger.error(f"TTS Error: {str(e)}")
-            raise HTTPException(status_code=500, detail=str(e))
+app = FastAPI()
 
 @app.post("/api/tts")
-async def text_to_speech(text: str, lang: str = None):
-    if not text or len(text.strip()) == 0:
-        raise HTTPException(status_code=400, detail="Le texte ne peut pas être vide")
-    
-    tts = TTSService()
-    audio_stream, detected_lang = await tts.generate_tts(text, lang)
-    
-    return StreamingResponse(
-        audio_stream,
-        media_type="audio/mpeg",
-        headers={
-            "Content-Disposition": f"inline; filename=tts_{datetime.now().strftime('%Y%m%d%H%M%S')}.mp3",
-            "X-Detected-Language": detected_lang,
-            "Cache-Control": "no-store"
-        }
-    )
+async def generate_tts(request: Request):
+    try:
+        data = await request.json()
+        text = data.get("text", "")
+        voice = data.get("voice", "fr-FR-DeniseNeural")  # Voix par défaut
 
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+        logger.info(f"TTS Request: '{text[:30]}...' with voice '{voice}'")
+
+        # Setup edge-tts
+        communicate = edge_tts.Communicate(text, voice)
+        audio_buffer = BytesIO()
+
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                audio_buffer.write(chunk["data"])
+
+        audio_buffer.seek(0)
+
+        return StreamingResponse(
+            content=audio_buffer,
+            media_type="audio/mpeg"
+        )
+
+    except Exception as e:
+        logger.error(f"TTS Error: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Erreur lors de la génération TTS"}
+        )
+
+
+@app.get("/api/voices")
+async def list_voices():
+    """Retourne toutes les voix disponibles."""
+    try:
+        voices = await edge_tts.list_voices()
+        return JSONResponse(content=voices)
+    except Exception as e:
+        logger.error(f"Error fetching voices: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Erreur lors de la récupération des voix"}
+        )
+
+
+@app.get("/api/status")
+async def status():
+    """Retourne le statut du serveur."""
+    return JSONResponse(content={"status": "OK", "message": "Service TTS opérationnel"})
+
+
+@app.get("/api/check-voice/{voice_name}")
+async def check_voice(voice_name: str):
+    """Vérifie si une voix spécifique est disponible."""
+    try:
+        voices = await edge_tts.list_voices()
+        voice_available = any(voice['Name'] == voice_name for voice in voices)
+        if voice_available:
+            return JSONResponse(content={"voice": voice_name, "available": True})
+        else:
+            return JSONResponse(content={"voice": voice_name, "available": False})
+    except Exception as e:
+        logger.error(f"Error checking voice {voice_name}: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Erreur lors de la vérification de la voix {voice_name}"}
+        )
+
+
+@app.get("/api/voices-by-text")
+async def voices_by_text(request: Request):
+    """Retourne les voix associées à la langue détectée du texte."""
+    try:
+        data = await request.json()
+        text = data.get("text", "")
+        if not text:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "Le texte est requis"}
+            )
+
+        # Détecter la langue du texte
+        language_code = detect(text)
+        logger.info(f"Detected language: {language_code}")
+
+        # Retourne les voix pour la langue détectée
+        return await voices_by_language(language_code)
+
+    except Exception as e:
+        logger.error(f"Error fetching voices for text: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Erreur lors de la détection de la langue et récupération des voix"}
+        )
+
+
+@app.get("/api/voices-by-language/{language_code}")
+async def voices_by_language(language_code: str):
+    """Retourne les voix masculines et féminines disponibles pour une langue donnée."""
+    try:
+        voices = await edge_tts.list_voices()
+
+        # Convertir le paramètre 'lang-' en format minuscule (par exemple 'fr' pour 'fr-FR', 'fr-CA', etc.)
+        language_prefix = language_code.lower()
+
+        # Filtrage des voix selon le préfixe de langue et le genre
+        male_voices = [
+            voice for voice in voices if voice['Locale'].lower().startswith(language_prefix) and voice['Gender'] == 'Male'
+        ]
+        female_voices = [
+            voice for voice in voices if voice['Locale'].lower().startswith(language_prefix) and voice['Gender'] == 'Female'
+        ]
+
+        return JSONResponse(content={
+            "male_voices": male_voices,
+            "female_voices": female_voices
+        })
+
+    except Exception as e:
+        logger.error(f"Error fetching voices for language {language_code}: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Erreur lors de la récupération des voix pour la langue {language_code}"}
+        )
+
+
+def aurun(host="0.0.0.0", port=8000):
+    logger.info(f"Starting on http://{host}:{port}")
+    uvicorn.run("app:app", host=host, port=port, reload=True)
+
+if __name__ == "__main__":
+    aurun()
