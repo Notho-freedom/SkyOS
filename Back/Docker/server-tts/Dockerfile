@@ -1,21 +1,34 @@
 # Utilise une image de base légère
 FROM python:3.9-slim
 
-# Installe les dépendances
+# Installe les dépendances système
 RUN apt-get update && apt-get install -y \
     wget \
     espeak \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
+# Crée un utilisateur non-root
+RUN useradd -m piperuser && \
+    mkdir -p /app/models && \
+    chown piperuser:piperuser /app
+
+# Passe à l'utilisateur non-root
+USER piperuser
+WORKDIR /app
+
 # Installe Piper
-RUN pip install piper-tts
+RUN python -m venv /app/venv && \
+    . /app/venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install piper-tts
 
-# Télécharge un modèle de voix (ex: voix française)
-RUN wget -O /tmp/fr_voice.onnx "https://huggingface.co/rhasspy/piper-tts/resolve/main/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx"
+# Télécharge le modèle français LOW (public)
+RUN wget -O /app/models/fr_voice.onnx \
+    "https://github.com/rhasspy/piper/releases/download/2023.12.06-1/fr_FR-siwis-low.onnx"
 
-# Expose le port HTTP (par défaut 5000)
+# Port d'écoute
 EXPOSE 5000
 
-# Lance Piper en mode serveur HTTP
-CMD ["piper", "--model", "/tmp/fr_voice.onnx", "--host", "0.0.0.0", "--port", "5000"]
+# Commande de démarrage
+CMD ["/app/venv/bin/piper", "--model", "/app/models/fr_voice.onnx", "--host", "0.0.0.0", "--port", "5000"]
