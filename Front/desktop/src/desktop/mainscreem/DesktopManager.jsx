@@ -54,6 +54,7 @@ const DesktopManager = () => {
       { label: "Changer le fond d'écran", action: () => bgRef.current?.refreshBackground() },
       { label: "Enregistrer le fond d'écran", action: () => bgRef.current?.saveCurrentBackground() },
       { separator: true },
+      { label: "Music", action: () => addApp('Lecteur de musique')},
       { 
         label: "Applications", 
         submenu: [
