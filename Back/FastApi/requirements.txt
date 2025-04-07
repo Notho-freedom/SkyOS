@@ -1,8 +1,5 @@
 fastapi==0.95.2
-gunicorn==20.1.0
 uvicorn==0.22.0
-gTTS==2.3.2
-googletrans==4.0.0-rc1
-pydub==0.25.1
-python-multipart==0.0.6
-langdetect
+edge-tts==0.1.0
+langdetect==1.0.9
+aiohttp==3.8.3
