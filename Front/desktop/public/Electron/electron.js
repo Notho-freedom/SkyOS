@@ -36,9 +36,6 @@ app.whenReady().then(() => {
 
   // Désactiver la redimension du contenu (le faire en fullscreen)
   mainWindow.setResizable(false);
-
-  // Assurer que les fenêtres restent toujours sur l'écran principal
-  mainWindow.setBounds({ x: 0, y: 0, width: 1280, height: 800 });
 });
 
 // Configurations GPU pour les performances

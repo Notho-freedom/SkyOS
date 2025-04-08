@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
+import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { useTranslation } from "react-i18next"
 import { 
   FaApple, FaWifi, FaBluetooth, FaVolumeUp, FaBatteryFull, 
@@ -12,6 +12,8 @@ import {
   MdKeyboard, MdCast
 } from "react-icons/md"
 import { useTheme } from "./../../theme/ThemeContext"
+import { useApp } from "../AppContext"
+import { useContextMenu } from "../contextual_menu/ContextMenuContext"
 
 const TopBar = () => {
   const { t } = useTranslation()
@@ -22,6 +24,8 @@ const TopBar = () => {
   const [currentDate, setCurrentDate] = useState("")
   const dropdownRefs = useRef({})
   const controlCenterRef = useRef(null)
+  const {top, setTop, setShowDock} = useApp();
+  const { showContextMenu } = useContextMenu();
 
   // Control Center states
   const [wifiEnabled, setWifiEnabled] = useState(true)
@@ -106,7 +110,7 @@ const TopBar = () => {
         { label: t("menu.Log Out...") },
       ],
     },
-    {
+    /*{
       name: t("menu.Finder"),
       items: [
         { label: t("menu.New Finder Window") },
@@ -171,12 +175,38 @@ const TopBar = () => {
       items: [
         { label: t("menu.macOS Help") }
       ],
-    },
+    },*/
   ], [t])
 
+  const handleTopBarContextMenu = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    let state = top=='top'? 'bottom':'top';
+  
+    const menuItems = [
+      {
+        label: `Move to ${state}`,
+        action: () => {
+          setTop(state);
+        },
+      },
+      { separator: true },
+      {
+        label: "Show Dock",
+        action: () => {
+          setShowDock(true);
+        },
+      }
+    ];
+
+    showContextMenu(menuItems, { x: e.clientX, y: e.clientY });
+  }, [showContextMenu, top]);
+
+
   return (
-    <div 
-      className="fixed top-0 left-0 right-0 h-7 flex justify-between items-center px-2 text-xs font-medium z-50 text-white"
+    <div
+      onContextMenu={(e)=>handleTopBarContextMenu(e)}
+      className={`fixed ${top}-0 left-0 right-0 h-7 flex items-center px-2 justify-between text-xs font-medium z-50 text-white`}
       style={{
         background: `linear-gradient(to right, ${theme.colors.primary}, ${theme.colors.secondary})`
       }}
@@ -195,7 +225,7 @@ const TopBar = () => {
             </button>
 
             {activeMenu === menu.name && (
-              <div className="absolute left-0 top-full mt-1 bg-gray-800 bg-opacity-90 backdrop-blur-md rounded-md shadow-lg min-w-40 py-1 border border-gray-700 z-50 text-white">
+              <div className={`absolute left-0 ${top}-full mt-1 bg-gray-800 bg-opacity-90 backdrop-blur-md rounded-md shadow-lg min-w-40 py-1 border border-gray-700 z-50 text-white`}>
                 {menu.items.map((item, idx) =>
                   item.separator ? (
                     <div key={`sep-${idx}`} className="my-1 h-px bg-gray-600" />
@@ -215,7 +245,7 @@ const TopBar = () => {
       </div>
 
       {/* Right side - Status icons and Control Center */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3 right-0">
         {/* Theme toggle button */}
         <button 
           onClick={toggleDarkMode}
@@ -248,7 +278,7 @@ const TopBar = () => {
           {/* Control Center Dropdown */}
           {controlCenterOpen && (
             <div 
-              className="absolute right-0 top-full mt-1 bg-gray-200 bg-opacity-80 backdrop-blur-md rounded-lg shadow-xl w-72 p-3 z-50 text-black"
+              className={`absolute right-0 ${top}-full mt-1 bg-gray-200 bg-opacity-80 backdrop-blur-md rounded-lg shadow-xl w-72 p-3 z-50 text-black`}
               style={{ backgroundColor: theme.colors.background, color: theme.colors.text }}
             >
               <div className="grid grid-cols-2 gap-2">
