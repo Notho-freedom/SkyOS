@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useCallback } from 'react';
-import apps from './../../Apps/apps'; // Importer la liste des applications
+import apps from './../../Apps/apps.jsx'; // Importer la liste des applications
 
 // Créer un contexte pour les fenêtres
 const WindowContext = createContext();

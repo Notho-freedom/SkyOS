@@ -6,6 +6,9 @@ import { useTheme } from "../../theme/ThemeContext"
 import { useWebApps } from "../../Apps/AppManager"
 import AppList from "../../Apps/AppWeb"
 import { useWindowContext } from "../window/WindowContext"
+import { Tooltip } from "react-tooltip"
+import "react-tooltip/dist/react-tooltip.css"
+import { useApp } from "../AppContext"
 
 // Composant de la sphère centrale avec animation
 const Sphere = ({action}) => {
@@ -41,41 +44,63 @@ const Sphere = ({action}) => {
 }
 
 // Composant d'icône d'application avec animation au survol
+
 const AppIcon = ({ app, onClick }) => {
+  const tooltipId = `tooltip-${app.name.replace(/\s+/g, "-").toLowerCase()}`;
+  const {theme} = useTheme();
+
   return (
-    <motion.div
-      className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[50px]"
-      onClick={onClick}
-      whileHover={{ scale: 1.2, y: -10 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-    >
+    <>
       <motion.div
-        className="rounded-xl p-1.5 transition-colors duration-200"
-        whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+        className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[50px]"
+        onClick={onClick}
+        whileHover={{ scale: 1.2, y: -10 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        data-tooltip-id={tooltipId}
+        data-tooltip-content={app.name}
       >
-        <img
-          src={app.icon || "/placeholder.svg"}
-          alt={app.name}
-          className="h-8 w-8 object-cover rounded-lg"
-          onError={(e) => (e.target.src = app.image)}
+        <motion.div
+          className="rounded-xl p-1.5 transition-colors duration-200"
+          whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+        >
+          <img
+            src={app.icon || "/placeholder.svg"}
+            alt={app.name}
+            className="h-8 w-8 object-cover rounded-lg"
+            onError={(e) => (e.target.src = app.image)}
+          />
+        </motion.div>
+
+        <motion.div
+          className="w-1 h-1 rounded-full bg-white mt-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: app.isActive ? 1 : 0 }}
         />
       </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 5 }}
-        whileHover={{ opacity: 1, y: 0 }}
-        className="absolute -top-8 px-2 py-1 bg-black/70 text-white text-xs rounded-md whitespace-nowrap"
-      >
-        {app.name}
-      </motion.div>
-      <motion.div
-        className="w-1 h-1 rounded-full bg-white mt-1"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: app.isActive ? 1 : 0 }}
+
+      <Tooltip
+        id={tooltipId}
+        place="top"
+        className="flex-wrap"
+              effect="solid"
+              style={{
+                backgroundColor: theme.colors.background,
+                color: theme.colors.text,
+                padding: "4px 8px",
+                borderRadius: "6px",
+                fontSize: "11px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                maxWidth: "120px",
+                alignContent: "center",
+                justifyContent: "center",
+                wordWrap: "break-word",
+              }}
       />
-    </motion.div>
+    </>
   )
 }
+
 
 const Dock = () => {
   const { theme } = useTheme()
@@ -84,6 +109,7 @@ const Dock = () => {
   const dockRef = useRef(null)
   const resizeFrame = useRef(null)
   const { addWindow, addApp } = useWindowContext()
+  const { showDock, setShowDock } = useApp()
 
   useEffect(() => {
     batchAddApps(AppList)
@@ -158,7 +184,7 @@ const Dock = () => {
 
   return (
     <motion.div
-      className="fixed left-1/4 bottom-4 flex items-center justify-center space-x-4 z-50"
+      className={`fixed left-1/4 bottom-4 ${showDock? 'flex':'hidden'} items-center justify-center space-x-4 z-50`}
       initial="hidden"
       animate="show"
       variants={dockAnimation}

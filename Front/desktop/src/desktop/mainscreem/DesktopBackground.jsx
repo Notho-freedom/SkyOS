@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import db from './db/backgroundsDb'; // IndexedDB via Dexie
 import { showNotification } from '../notify/notifications';
 import fallback from "./fallback/fallback.jpeg";
+import Loader from '../../animations/loader';
 
 const blobToDataURL = (blob) =>
   new Promise((resolve, reject) => {
@@ -37,7 +38,7 @@ const blobToDataURL = (blob) =>
         const savedBackgrounds = await db.getAllBackgrounds();
         if (savedBackgrounds.length > 0) {
           const fallback = savedBackgrounds[Math.floor(Math.random() * savedBackgrounds.length)].dataUrl;
-          console.log(fallback);
+          //console.log(fallback);
           setCurrentBg(fallback);
           setNextBg(fallback);
           showNotification('Fond d\'écran', 'Chargement d\'une image sauvegardée', 'info');
@@ -45,7 +46,7 @@ const blobToDataURL = (blob) =>
         }
         return false;
       } catch (error) {
-        console.error('Erreur lors du chargement des images sauvegardées:', error);
+        //console.error('Erreur lors du chargement des images sauvegardées:', error);
         return false;
       }
     }, []);
@@ -72,7 +73,7 @@ const blobToDataURL = (blob) =>
         const blob = await response.blob();
         return URL.createObjectURL(blob);
       } catch (error) {
-        console.error('Erreur de récupération de l\'image en ligne:', error);
+        //console.error('Erreur de récupération de l\'image en ligne:', error);
         
         // Essayer de charger une image sauvegardée
         const hasFallback = await loadFallbackImage();
@@ -119,13 +120,13 @@ const blobToDataURL = (blob) =>
             await db.addBackground(dataUrl);
             showNotification('Sauvegarde', 'Nouveau fond d\'écran sauvegardé', 'success');
           } catch (err) {
-            console.error("Erreur lors de la sauvegarde:", err);
+            //console.error("Erreur lors de la sauvegarde:", err);
           }
         }
   
         setNextBg(newBg);
       } catch (error) {
-        console.error('Erreur de rafraîchissement:', error);
+        //console.error('Erreur de rafraîchissement:', error);
         showNotification('Erreur', 'Problème lors du rafraîchissement', 'error');
         setLoading(false);
       }
@@ -142,10 +143,10 @@ const blobToDataURL = (blob) =>
       // Sauvegarde manuelle de l'image dans IndexedDB
       await db.addBackground(dataUrl);
       showNotification('Fond d\'écran sauvegardé', 'Le fond d\'écran a été sauvegardé manuellement dans IndexedDB.', 'success');
-      console.log("Fond d'écran sauvegardé manuellement dans IndexedDB.");
+      //console.log("Fond d'écran sauvegardé manuellement dans IndexedDB.");
     } catch (err) {
       showNotification('Erreur de sauvegarde', 'Erreur lors de la sauvegarde manuelle du fond d\'écran.', 'error');
-      console.error("Erreur lors de la sauvegarde manuelle du fond d'écran :", err);
+      //console.error("Erreur lors de la sauvegarde manuelle du fond d'écran :", err);
     }
   }, [currentBg]);
   
@@ -178,11 +179,8 @@ const blobToDataURL = (blob) =>
     <div className="relative w-screen h-screen overflow-hidden">
       {/* Loader affiché pendant le chargement initial */}
       {loading && !nextBg && (
-        <div className="absolute inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
-          <div className="relative w-20 h-20">
-            <div className="absolute inset-0 w-full h-full border-4 border-blue-500 rounded-full animate-ping"></div>
-            <div className="absolute inset-0 w-full h-full border-4 border-gray-300 rounded-full animate-spin"></div>
-          </div>
+        <div className="absolute inset-0 flex items-center justify-center z-100 bg-gray-900 bg-opacity-100">
+          <Loader />
         </div>
       )}
 
