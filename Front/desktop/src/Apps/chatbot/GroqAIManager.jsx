@@ -185,10 +185,7 @@ const GroqAIWithModelSelection = () => {
       }
   
       // 2. Essayer chaque voix disponible jusqu'à ce qu'une fonctionne
-      let selectedVoice = null;
       let audioBlob = null;
-      console.log(voices);
-  
 
   
         for (let name = 0; name < voices.female_voices.length; name++) {
