@@ -177,38 +177,37 @@ const blobToDataURL = (blob) =>
   //showNotification('Systeme', "Bienvenue", 'info');
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      {/* Loader affiché pendant le chargement initial */}
-      {loading && !nextBg && (
-        <div className="absolute inset-0 flex items-center justify-center z-100 bg-gray-900 bg-opacity-100">
+      {loading ? (
+        <div className="absolute inset-0 flex items-center justify-center z-[100] bg-gray-900 bg-opacity-100">
           <Loader />
         </div>
+      ) : (
+        <>
+          {currentBg && imageLoaded && (
+            <img
+              alt="Fond d'écran actuel"
+              className="absolute inset-0 w-full h-full object-cover z-[-1]"
+              src={currentBg}
+            />
+          )}
+  
+          {nextBg && (
+            <img
+              alt="Fond d'écran suivant"
+              className="absolute inset-0 w-full h-full object-cover z-[-1]"
+              src={nextBg}
+              onLoad={handleImageLoad}
+            />
+          )}
+  
+          <div className="relative w-full h-full">
+            {children}
+          </div>
+        </>
       )}
-
-      {/* Fond d'écran actuel sans animation */}
-      {currentBg && imageLoaded && (
-        <img
-          alt="Fond d'écran actuel"
-          className="absolute inset-0 w-full h-full object-cover z-[-1]"
-          src={currentBg}
-        />
-      )}
-
-      {/* Fond d'écran suivant sans animation */}
-      {nextBg && (
-        <img
-          alt="Fond d'écran suivant"
-          className="absolute inset-0 w-full h-full object-cover z-[-1]"
-          src={nextBg}
-          onLoad={handleImageLoad} // Déclenchement lorsque l'image suivante est chargée
-        />
-      )}
-
-      {/* Conteneur pour les enfants */}
-      <div className="relative w-full h-full">
-        {children}
-      </div>
     </div>
   );
+  
 });
 
 DesktopBackground.propTypes = {
