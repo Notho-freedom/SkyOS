@@ -1,5 +1,4 @@
 const { app, BrowserWindow } = require("electron");
-const path = require("path");
 
 let mainWindow;
 
@@ -12,19 +11,15 @@ app.whenReady().then(() => {
     frame: false,  // Pas de barre de titre ou de bordure
     show: false,  // Ne pas montrer la fenêtre immédiatement
     transparent: true,  // Fenêtre transparente si tu veux un effet verre
-    alwaysOnTop: true,  // Toujours au-dessus des autres fenêtres
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),  // Charger un fichier préchargeant pour le processus renderer
-      webSecurity: false,  // Désactiver la politique de sécurité de même origine (utile pour les apps locales, mais attention aux risques)
-      allowRunningInsecureContent: true,  // Permet l'exécution de contenu non sécurisé (utile pour du dev ou certaines apps)
+      webSecurity: true,  // Désactiver la politique de sécurité de même origine (utile pour les apps locales, mais attention aux risques)
       nodeIntegration: true,  // Sécurité : évite l'accès aux API Node.js dans le renderer (ne jamais activer en prod !)
-      contextIsolation: true,  // Sécurise le renderer en isolant son contexte
       webviewTag: true,  // Permet d'utiliser <webview> dans le HTML (si nécessaire)
     },
   });
 
   // Charge ton app React (ici un exemple avec une URL externe)
-  mainWindow.loadURL("http://localhost:3000/");
+  mainWindow.loadURL("https://www.skyos.genesis-company.net/");
 
   // Quand la page est prête, on l'affiche
   mainWindow.once('ready-to-show', () => {

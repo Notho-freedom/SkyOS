@@ -1,0 +1,7 @@
+node_modules
+.vite
+dist
+src
+*.md
+*.log
+vite.config.js
