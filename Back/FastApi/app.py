@@ -92,6 +92,7 @@ async def check_voice(voice_name: str):
         )
 
 
+
 @app.post("/api/voices-by-text")
 async def voices_by_text(request: Request):
     """Retourne les voix associées à la langue détectée du texte."""
