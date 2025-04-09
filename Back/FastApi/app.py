@@ -16,7 +16,11 @@ app = FastAPI()
 # Configuration CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permet toutes les origines
+    allow_origins=[
+        "http://localhost:3000",  # Origine localhost sur port 3000
+        "https://skyos.onrender.com",  # Origine SkyOS sur Render
+        "https://skyos.genesis-company.net",  # Origine SkyOS sur Genesis-Company.net
+    ],
     allow_credentials=True,
     allow_methods=["*"],  # Permet toutes les méthodes HTTP (GET, POST, etc.)
     allow_headers=["*"],  # Permet tous les en-têtes
