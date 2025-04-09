@@ -1,108 +1,16 @@
 import { memo, useEffect, useState, useRef, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useTheme } from "../../theme/ThemeContext"
 import { useWebApps } from "../../Apps/AppManager"
-import AppList from "../../Apps/AppWeb"
 import { useWindowContext } from "../window/WindowContext"
-import { Tooltip } from "react-tooltip"
-import "react-tooltip/dist/react-tooltip.css"
+import DockBar from "./DockBar"
+import Sphere from "./Sphere"
 import { useApp } from "../AppContext"
-
-// Composant de la sphère centrale avec animation
-const Sphere = ({ action }) => {
-  return (
-    <motion.div
-      className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 via-purple-400 to-blue-300 z-50 flex justify-center items-center shadow-lg"
-      initial={{ scale: 0.8 }}
-      animate={{
-        scale: [0.9, 1, 0.9],
-        rotate: [0, 180, 360],
-      }}
-      transition={{
-        duration: 8,
-        repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
-      }}
-      onClick={action}
-      title="MAX IA"
-    >
-      <motion.div
-        className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md"
-        animate={{
-          scale: [1, 0.8, 1],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Number.POSITIVE_INFINITY,
-          ease: "easeInOut",
-        }}
-      />
-    </motion.div>
-  )
-}
-
-// Composant d'icône d'application avec animation au survol
-const AppIcon = ({ app, onClick }) => {
-  const tooltipId = `tooltip-${app.name.replace(/\s+/g, "-").toLowerCase()}`;
-  const { theme } = useTheme();
-
-  return (
-    <>
-      <motion.div
-        className="app-item relative flex flex-col items-center group cursor-pointer flex-shrink-0 min-w-[50px]"
-        onClick={onClick}
-        whileHover={{ scale: 1.2, y: -10 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 400, damping: 17 }}
-        data-tooltip-id={tooltipId}
-        data-tooltip-content={app.name}
-      >
-        <motion.div
-          className="rounded-xl p-1.5 transition-colors duration-200"
-          whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
-        >
-          <img
-            src={app.icon || "/placeholder.svg"}
-            alt={app.name}
-            className="h-8 w-8 object-cover rounded-lg"
-            onError={(e) => (e.target.src = app.image)}
-          />
-        </motion.div>
-
-        <motion.div
-          className="w-1 h-1 rounded-full bg-white mt-1"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: app.isActive ? 1 : 0 }}
-        />
-      </motion.div>
-
-      <Tooltip
-        id={tooltipId}
-        place="top"
-        className="flex-wrap"
-        effect="solid"
-        style={{
-          backgroundColor: theme.colors.background,
-          color: theme.colors.text,
-          padding: "4px 8px",
-          borderRadius: "6px",
-          fontSize: "11px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          maxWidth: "120px",
-          alignContent: "center",
-          justifyContent: "center",
-          wordWrap: "break-word",
-        }}
-      />
-    </>
-  )
-}
+import AppList from './../../Apps/AppWeb';
 
 const Dock = () => {
-  const { theme } = useTheme()
   const { batchAddApps, apps, loading, Refresh } = useWebApps()
   const [visibleAppsCount, setVisibleAppsCount] = useState(apps.length)
-  const [show, setShow] = useState(false)  // Ajout d'état pour gérer l'affichage
+  const [show, setShow] = useState(false)
   const dockRef = useRef(null)
   const resizeFrame = useRef(null)
   const { addWindow, addApp } = useWindowContext()
@@ -111,12 +19,11 @@ const Dock = () => {
   useEffect(() => {
     batchAddApps(AppList)
 
-    // Temporisation de 3 secondes pour afficher le dock
     const timeout = setTimeout(() => {
       setShow(true)
     }, 10000)
 
-    return () => clearTimeout(timeout) // Nettoyer le timeout si nécessaire
+    return () => clearTimeout(timeout)
   }, [Refresh, batchAddApps])
 
   const handleResize = useCallback(() => {
@@ -177,55 +84,13 @@ const Dock = () => {
     <motion.div
       className={`fixed left-1/4 bottom-4 ${showDock ? 'flex' : 'hidden'} items-center justify-center space-x-4 z-50`}
       style={{
-        opacity: show ? 1 : 0,  // Change d'opacity selon l'état "show"
+        opacity: show ? 1 : 0,
         transition: "opacity 1s ease-in-out",
       }}
     >
-      {/* Barre gauche sans animation */}
-      <div
-        ref={dockRef}
-        className={`flex flex-row justify-center items-center gap-2 min-h-[50px] px-2 ${theme.name === "dark" ? "bg-gray-900/60 border-gray-700" : "bg-white/20 border-gray-200"} backdrop-blur-xl border rounded-2xl shadow-xl z-50`}
-      >
-        {loading ? (
-          <div className="flex items-center justify-center p-3">
-            <motion.div
-              className="w-5 h-5 border-3 border-blue-500 border-t-transparent rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-            />
-          </div>
-        ) : (
-          <AnimatePresence>
-            {apps.slice(0, visibleAppsCount / 2).map((app) => (
-              <AppIcon key={app.id} app={app} onClick={() => addWindow(app)} />
-            ))}
-          </AnimatePresence>
-        )}
-      </div>
-
-      {/* Sphère au centre */}
+      <DockBar apps={apps} loading={loading} visibleAppsCount={visibleAppsCount} dockRef={dockRef} addWindow={addWindow} />
       <Sphere action={() => addApp('Chatbot')} />
-
-      {/* Barre droite sans animation */}
-      <div
-        className={`flex flex-row justify-center items-center gap-2 min-h-[50px] px-2 ${theme.name === "dark" ? "bg-gray-900/60 border-gray-700" : "bg-white/20 border-gray-200"} backdrop-blur-xl border rounded-2xl shadow-xl z-50`}
-      >
-        {loading ? (
-          <div className="flex items-center justify-center p-3">
-            <motion.div
-              className="w-5 h-5 border-3 border-blue-500 border-t-transparent rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-            />
-          </div>
-        ) : (
-          <AnimatePresence>
-            {apps.slice(visibleAppsCount / 2, visibleAppsCount).map((app) => (
-              <AppIcon key={app.id} app={app} onClick={() => addWindow(app)} />
-            ))}
-          </AnimatePresence>
-        )}
-      </div>
+      <DockBar apps={apps} loading={loading} visibleAppsCount={visibleAppsCount} dockRef={dockRef} addWindow={addWindow} />
     </motion.div>
   )
 }
