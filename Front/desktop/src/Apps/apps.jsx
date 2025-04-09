@@ -1,6 +1,6 @@
 import ReactPlayer from 'react-player';
 
-import GroqMegaAI from './chatbot/GroqAIManager';
+import GroqAIWithModelSelection from './chatbot/GroqAIManager';
 
 import BackgroundGallery from './BackgroundGallery';
 import AppDetailsCard from './AppDetailsCard';
@@ -17,7 +17,7 @@ const apps = [
     <ReactPlayer url="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" controls />
   )},
 
-  { name: 'Chatbot', component: () => <GroqMegaAI />}
+  { name: 'Chatbot', component: () => <GroqAIWithModelSelection />}
 ];
 
 export default apps;
