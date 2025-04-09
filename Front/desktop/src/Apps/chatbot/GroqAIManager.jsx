@@ -64,7 +64,6 @@ const GroqAIWithModelSelection = () => {
     recognitionRef.current = recognition;
   };
   
-
   const stopVoiceRecognition = () => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
@@ -95,6 +94,9 @@ const GroqAIWithModelSelection = () => {
         if (availableModels.length > 0) {
           await sendSystemConnectionPrompt(availableModels[0], history);
         }
+
+        // Démarrer la reconnaissance vocale dès le lancement
+        startVoiceRecognition();
       } catch (err) {
         console.error("Erreur d'initialisation:", err);
       }
@@ -165,11 +167,10 @@ const GroqAIWithModelSelection = () => {
       .trim();                                  // Supprime les espaces de début et fin
   };
 
-
   const generateAndPlayAudio = async (text) => {
     try {
       // 1. Appel à l'API pour détecter la langue du texte et récupérer les voix
-      const responseVoices = await fetch('http://localhost:8000/api/voices-by-text', {
+      const responseVoices = await fetch('https://low-tts.onrender.com/api/voices-by-text', {
         method: 'POST',  // Change de GET à POST
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sanitizeTextForTTS(text) }), // Envoie les données dans le corps de la requête
@@ -192,7 +193,7 @@ const GroqAIWithModelSelection = () => {
           const element = voices.female_voices[name];
           
           // Appel à l'API de synthèse vocale avec la voix dynamique
-          const responseAudio = await fetch('http://localhost:8000/api/tts', {
+          const responseAudio = await fetch('https://low-tts.onrender.com/api/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -220,18 +221,18 @@ const GroqAIWithModelSelection = () => {
       setResponse('Erreur lors de la génération de l\'audio.');
     }
   };
-  
-
-  
 
   const sendPrompt = async () => {
     if (!message || !selectedModel) return;
     setLoading(true);
 
+    // Exclure "Alice" du message
+    const filteredMessage = message.replace(/\bAlice\b/g, '').trim();
+
     const summary = summarizeConversation();
     const messages = [
       { role: "system", content: `Historique de conversation:\n${summary}` },
-      { role: "user", content: message },
+      { role: "user", content: filteredMessage }, // Utilisation du message filtré
     ];
 
     try {
@@ -244,7 +245,7 @@ const GroqAIWithModelSelection = () => {
       setResponse(text);
 
       const newHistory = [
-        { role: "user", content: message },
+        { role: "user", content: filteredMessage },
         { role: "assistant", content: text }
       ];
 
@@ -254,6 +255,7 @@ const GroqAIWithModelSelection = () => {
 
       await generateAndPlayAudio(text);
       setMessage('');
+      startVoiceRecognition(); // Re-démarrer l'écoute après l'envoi
     } catch (err) {
       console.error("Erreur IA:", err);
       setResponse("Erreur lors de la communication avec l'IA.");
@@ -294,21 +296,15 @@ const GroqAIWithModelSelection = () => {
       <button 
         onClick={sendPrompt} 
         disabled={loading} 
-        className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+        className="px-4 py-2 text-white bg-blue-500 rounded"
       >
-        {loading ? "Chargement..." : "Envoyer"}
+        {loading ? "Envoi..." : "Envoyer"}
       </button>
 
-  <button onClick={isListening ? stopVoiceRecognition : startVoiceRecognition} className={`ml-2 px-4 py-2 rounded ${isListening ? 'bg-red-600' : 'bg-green-600'} hover:opacity-80`}>{isListening ? "🎙️ Stop" : "🎤 Démarrer voix"}</button>
-
-
-      {/* Réponse IA */}
-      {response && (
-        <div className="mt-4">
-          <h4 className="font-semibold">Réponse :</h4>
-          <p>{response}</p>
-        </div>
-      )}
+      {/* Affichage de la réponse */}
+      <div className="mt-4">
+        <p>{response}</p>
+      </div>
     </div>
   );
 };

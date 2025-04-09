@@ -10,7 +10,15 @@ export default defineConfig({
   },
   server: {
     port: 3000, // Port pour le serveur de développement
+    proxy: {
+      '/api': {
+        target: 'https://low-tts.onrender.com',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ''), // Facultatif: pour réécrire les URLs si nécessaire
+      },
   },
+},
   define: {
     'process.env': {},
   },
