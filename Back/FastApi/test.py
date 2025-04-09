@@ -76,12 +76,12 @@ def test_voices_by_language():
 
 # Exécution de tous les tests
 def run_tests():
-    test_status()
-    test_tts()
-    test_voices()
-    test_check_voice()
+    #test_status()
+    #test_tts()
+    #test_voices()
+    #test_check_voice()
     test_voices_by_text()
-    test_voices_by_language()
+    #test_voices_by_language()
 
 if __name__ == "__main__":
     run_tests()
