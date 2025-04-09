@@ -34,3 +34,22 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+
+  .icon-animation {
+    opacity: 0;
+    transform: scale(0.8);
+    animation: fadeInZoom 0.5s forwards;
+  }
+  
+  @keyframes fadeInZoom {
+    0% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  

@@ -1,6 +1,4 @@
-"use client"
-
-import { memo, useEffect, useCallback, useRef, useState } from "react"
+import { memo, useEffect, useState, useRef, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "../../theme/ThemeContext"
 import { useWebApps } from "../../Apps/AppManager"
@@ -11,7 +9,7 @@ import "react-tooltip/dist/react-tooltip.css"
 import { useApp } from "../AppContext"
 
 // Composant de la sphère centrale avec animation
-const Sphere = ({action}) => {
+const Sphere = ({ action }) => {
   return (
     <motion.div
       className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 via-purple-400 to-blue-300 z-50 flex justify-center items-center shadow-lg"
@@ -44,10 +42,9 @@ const Sphere = ({action}) => {
 }
 
 // Composant d'icône d'application avec animation au survol
-
 const AppIcon = ({ app, onClick }) => {
   const tooltipId = `tooltip-${app.name.replace(/\s+/g, "-").toLowerCase()}`;
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   return (
     <>
@@ -83,29 +80,29 @@ const AppIcon = ({ app, onClick }) => {
         id={tooltipId}
         place="top"
         className="flex-wrap"
-              effect="solid"
-              style={{
-                backgroundColor: theme.colors.background,
-                color: theme.colors.text,
-                padding: "4px 8px",
-                borderRadius: "6px",
-                fontSize: "11px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                maxWidth: "120px",
-                alignContent: "center",
-                justifyContent: "center",
-                wordWrap: "break-word",
-              }}
+        effect="solid"
+        style={{
+          backgroundColor: theme.colors.background,
+          color: theme.colors.text,
+          padding: "4px 8px",
+          borderRadius: "6px",
+          fontSize: "11px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          maxWidth: "120px",
+          alignContent: "center",
+          justifyContent: "center",
+          wordWrap: "break-word",
+        }}
       />
     </>
   )
 }
 
-
 const Dock = () => {
   const { theme } = useTheme()
   const { batchAddApps, apps, loading, Refresh } = useWebApps()
   const [visibleAppsCount, setVisibleAppsCount] = useState(apps.length)
+  const [show, setShow] = useState(false)  // Ajout d'état pour gérer l'affichage
   const dockRef = useRef(null)
   const resizeFrame = useRef(null)
   const { addWindow, addApp } = useWindowContext()
@@ -113,6 +110,13 @@ const Dock = () => {
 
   useEffect(() => {
     batchAddApps(AppList)
+
+    // Temporisation de 3 secondes pour afficher le dock
+    const timeout = setTimeout(() => {
+      setShow(true)
+    }, 10000)
+
+    return () => clearTimeout(timeout) // Nettoyer le timeout si nécessaire
   }, [Refresh, batchAddApps])
 
   const handleResize = useCallback(() => {
@@ -169,33 +173,18 @@ const Dock = () => {
     handleResize()
   }, [apps, handleResize])
 
-  // Animation d'entrée pour le dock
-  const dockAnimation = {
-    hidden: { opacity: 0, y: 50 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: [0.22, 1, 0.36, 1],
-      },
-    },
-  }
-
   return (
     <motion.div
-      className={`fixed left-1/4 bottom-4 ${showDock? 'flex':'hidden'} items-center justify-center space-x-4 z-50`}
-      initial="hidden"
-      animate="show"
-      variants={dockAnimation}
+      className={`fixed left-1/4 bottom-4 ${showDock ? 'flex' : 'hidden'} items-center justify-center space-x-4 z-50`}
+      style={{
+        opacity: show ? 1 : 0,  // Change d'opacity selon l'état "show"
+        transition: "opacity 1s ease-in-out",
+      }}
     >
-      {/* Barre gauche */}
-      <motion.div
+      {/* Barre gauche sans animation */}
+      <div
         ref={dockRef}
-        className={`flex flex-row justify-center items-center gap-2 min-h-[50px] px-2 ${
-          theme.name === "dark" ? "bg-gray-900/60 border-gray-700" : "bg-white/20 border-gray-200"
-        } backdrop-blur-xl border rounded-2xl shadow-xl z-50`}
-        layout
+        className={`flex flex-row justify-center items-center gap-2 min-h-[50px] px-2 ${theme.name === "dark" ? "bg-gray-900/60 border-gray-700" : "bg-white/20 border-gray-200"} backdrop-blur-xl border rounded-2xl shadow-xl z-50`}
       >
         {loading ? (
           <div className="flex items-center justify-center p-3">
@@ -212,17 +201,14 @@ const Dock = () => {
             ))}
           </AnimatePresence>
         )}
-      </motion.div>
+      </div>
 
       {/* Sphère au centre */}
-      <Sphere action={()=>addApp('Chatbot')} />
+      <Sphere action={() => addApp('Chatbot')} />
 
-      {/* Barre droite */}
-      <motion.div
-        className={`flex flex-row justify-center items-center gap-2 min-h-[50px] px-2 ${
-          theme.name === "dark" ? "bg-gray-900/60 border-gray-700" : "bg-white/20 border-gray-200"
-        } backdrop-blur-xl border rounded-2xl shadow-xl z-50`}
-        layout
+      {/* Barre droite sans animation */}
+      <div
+        className={`flex flex-row justify-center items-center gap-2 min-h-[50px] px-2 ${theme.name === "dark" ? "bg-gray-900/60 border-gray-700" : "bg-white/20 border-gray-200"} backdrop-blur-xl border rounded-2xl shadow-xl z-50`}
       >
         {loading ? (
           <div className="flex items-center justify-center p-3">
@@ -239,10 +225,9 @@ const Dock = () => {
             ))}
           </AnimatePresence>
         )}
-      </motion.div>
+      </div>
     </motion.div>
   )
 }
 
 export default memo(Dock)
-

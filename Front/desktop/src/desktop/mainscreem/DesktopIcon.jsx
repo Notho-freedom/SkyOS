@@ -230,7 +230,7 @@ const IconGrid = () => {
         key={cols}
         className="icon-grid"
         layout={layout}
-        cols={cols*2*window.innerWidth/window.innerHeight} // Utiliser directement le nombre de colonnes calculé
+        cols={cols * 2 * window.innerWidth / window.innerHeight}
         rowHeight={55}
         margin={[10, 10]}
         containerPadding={[15, 15]}
@@ -238,15 +238,15 @@ const IconGrid = () => {
         isDraggable
         isResizable={false}
         autoSize={true}
-        compactType={null} // Désactiver le compactage automatique
+        compactType={null}
       >
         {apps.map((icon) => (
           <div
             key={icon.id}
-            className="group gap-1 flex flex-col items-center justify-center rounded-lg transition-all duration-300 hover:scale-105 hover:bg-[rgba(255,255,255,0.11)] hover:backdrop-blur-lg text-white"
+            className="group gap-1 flex flex-col items-center justify-center rounded-lg transition-all duration-300 hover:scale-105 hover:bg-[rgba(255,255,255,0.11)] hover:backdrop-blur-lg text-white icon-animation"
             onDoubleClick={() => handleWindowAction(icon)}
             data-tooltip-id={`tooltip-${icon.id}`}
-            onContextMenu={(e) => handleIconContextMenu(e,icon)}
+            onContextMenu={(e) => handleIconContextMenu(e, icon)}
           >
             <img 
               src={icon.icon} 
@@ -284,6 +284,7 @@ const IconGrid = () => {
       </ReactGridLayout>
     </div>
   );
+  
 };
 
 export default IconGrid;
