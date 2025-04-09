@@ -49,8 +49,7 @@ const GroqAIWithModelSelection = () => {
       clearTimeout(silenceTimeoutRef.current);
       silenceTimeoutRef.current = setTimeout(() => {
         stopVoiceRecognition();
-        sendPrompt();
-      }, 2000); // 2s de silence = go !
+      }, 2000);
     };
   
     recognition.onerror = (e) => {
@@ -64,6 +63,7 @@ const GroqAIWithModelSelection = () => {
     recognitionRef.current = recognition;
   };
   
+
   const stopVoiceRecognition = () => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
@@ -94,9 +94,6 @@ const GroqAIWithModelSelection = () => {
         if (availableModels.length > 0) {
           await sendSystemConnectionPrompt(availableModels[0], history);
         }
-
-        // Démarrer la reconnaissance vocale dès le lancement
-        startVoiceRecognition();
       } catch (err) {
         console.error("Erreur d'initialisation:", err);
       }
@@ -107,7 +104,7 @@ const GroqAIWithModelSelection = () => {
 
   const sendSystemConnectionPrompt = async (model, history) => {
     try {
-      const systemPrompt = "utilisateur conneter";
+      const systemPrompt = "l'utilisateur conneter, demande son nom si tu ne le connais pas encore, sinon parle lui de SkyOS et de ta mission en tant qu'assistant";
       const messages = [
         { role: "system", content: "Historique de conversation:\n" + summarizeConversation(history) },
         { role: "user", content: systemPrompt }
@@ -166,6 +163,7 @@ const GroqAIWithModelSelection = () => {
       .replace(/\s+/g, ' ')                     // Nettoie les espaces multiples
       .trim();                                  // Supprime les espaces de début et fin
   };
+
 
   const generateAndPlayAudio = async (text) => {
     try {
@@ -226,13 +224,10 @@ const GroqAIWithModelSelection = () => {
     if (!message || !selectedModel) return;
     setLoading(true);
 
-    // Exclure "Alice" du message
-    const filteredMessage = message.replace(/\bAlice\b/g, '').trim();
-
     const summary = summarizeConversation();
     const messages = [
       { role: "system", content: `Historique de conversation:\n${summary}` },
-      { role: "user", content: filteredMessage }, // Utilisation du message filtré
+      { role: "user", content: message },
     ];
 
     try {
@@ -245,7 +240,7 @@ const GroqAIWithModelSelection = () => {
       setResponse(text);
 
       const newHistory = [
-        { role: "user", content: filteredMessage },
+        { role: "user", content: message },
         { role: "assistant", content: text }
       ];
 
@@ -255,7 +250,6 @@ const GroqAIWithModelSelection = () => {
 
       await generateAndPlayAudio(text);
       setMessage('');
-      startVoiceRecognition(); // Re-démarrer l'écoute après l'envoi
     } catch (err) {
       console.error("Erreur IA:", err);
       setResponse("Erreur lors de la communication avec l'IA.");
@@ -269,7 +263,7 @@ const GroqAIWithModelSelection = () => {
       <h3 className="mb-2 font-bold">🧠 IA Groq (avec mémoire locale)</h3>
 
       {/* Sélection du modèle */}
-      <div className="mb-4">
+      <div className="mb-4 hidden">
         <label htmlFor="modelSelect" className="block text-sm">Choisir un modèle:</label>
         <select
           id="modelSelect"
@@ -296,15 +290,21 @@ const GroqAIWithModelSelection = () => {
       <button 
         onClick={sendPrompt} 
         disabled={loading} 
-        className="px-4 py-2 text-white bg-blue-500 rounded"
+        className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
       >
-        {loading ? "Envoi..." : "Envoyer"}
+        {loading ? "Chargement..." : "Envoyer"}
       </button>
 
-      {/* Affichage de la réponse */}
-      <div className="mt-4">
-        <p>{response}</p>
-      </div>
+  <button onClick={isListening ? stopVoiceRecognition : startVoiceRecognition} className={`ml-2 px-4 py-2 rounded ${isListening ? 'bg-red-600' : 'bg-green-600'} hover:opacity-80`}>{isListening ? "🎙️ Stop" : "🎤 Démarrer voix"}</button>
+
+
+      {/* Réponse IA */}
+      {response && (
+        <div className="mt-4">
+          <h4 className="font-semibold">Réponse :</h4>
+          <p>{response}</p>
+        </div>
+      )}
     </div>
   );
 };
