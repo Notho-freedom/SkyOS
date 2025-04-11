@@ -3,7 +3,7 @@ import GroqAIWithModelSelection from './chatbot/GroqAIManager';
 import BackgroundGallery from './BackgroundGallery';
 import AppDetailsCard from './AppDetailsCard';
 import SettingsWindow from './../components/settings/SettingsWindow';
-import RealisticAI from './Ai';
+import ChatInterface from './Ai';
 
 const apps = [
   {
@@ -24,7 +24,7 @@ const apps = [
   {
     id: 'ai',
     name: 'IA',
-    component: () => <RealisticAI />
+    component: () => <ChatInterface />
   },
   {
     id: 'music-player',

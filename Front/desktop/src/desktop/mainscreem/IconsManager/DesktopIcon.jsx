@@ -16,18 +16,20 @@ const IconGrid = () => {
 
   // Mise à jour dynamique de la grille
   const updateGrid = useCallback(() => {
-    const margin = [12, 12]; // Marge
-    const containerPadding = [15, 15]; // Padding
+    const margin = [12, 12]; // Marge [horizontal, vertical]
+    const containerPadding = [15, 15]; // Padding du conteneur
     const rowHeight = 55; // Hauteur de ligne fixe
 
-    // Calcul de la hauteur disponible
+    // Calcul de la hauteur disponible pour les icônes
     const availableHeight = window.innerHeight 
-      - (containerPadding[1] * 2) 
-      - (margin[1] * 2); // Marges verticales
+      - (containerPadding[1] * 2) // Padding haut/bas
+      - (margin[1] * 2); // Marge verticale totale
 
+    // Calculer le nombre de lignes par colonne
     const rowHeightWithMargin = rowHeight + margin[1];
     const calculatedRowsPerColumn = Math.max(1, Math.floor(availableHeight / rowHeightWithMargin));
 
+    // Calculer le nombre de colonnes nécessaires
     const calculatedCols = Math.ceil(apps.length / calculatedRowsPerColumn);
 
     setRowsPerColumn(calculatedRowsPerColumn);
@@ -40,17 +42,18 @@ const IconGrid = () => {
     return () => window.removeEventListener("resize", updateGrid);
   }, [updateGrid]);
 
-  // Configuration du layout pour ReactGridLayout
   const layout = apps.map((icon, index) => ({
     i: icon.id,
     x: Math.floor(index / rowsPerColumn), // Colonne calculée
-    y: index % rowsPerColumn, // Position verticale
+    y: index % rowsPerColumn, // Position verticale dans la colonne
     w: 1,
     h: 1,
   }));
 
-  const cellWidth = 60; // Largeur des cellules
-  const gridWidth = cols * cellWidth + ((cols - 1) * 15) + (10 * 2); // Largeur totale de la grille
+  // Définir une largeur de cellule fixe pour le calcul
+  const cellWidth = 60;
+  // Calculer la largeur totale de la grille
+  const gridWidth = cols * cellWidth + ((cols - 1) * 15) + (10 * 2); // 15 = marge horizontale, 10 = padding horizontal
 
   // Fonction de gestion du menu contextuel
   const handleIconContextMenu = (e, icon) => {
