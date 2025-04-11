@@ -2,66 +2,14 @@
   "name": "desktop",
   "version": "0.1.0",
   "private": true,
-  "main": "public/Electron/electron.js",
   "homepage": "./",
   "author": "Genesis Company",
   "description": "SkyOS is a powerful and versatile operating system designed to provide users with a seamless and efficient computing experience. With its user-friendly interface, robust performance, and extensive features, SkyOS empowers users to accomplish their tasks with ease and productivity.",
-  "build": {
-    "appId": "com.skyos.desktop",
-    "copyright": "Copyright © 2025 Genesis Company.",
-    "productName": "SkyOS",
-    "asar": true,
-    "compression": "maximum",
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "Notho-freedom",
-        "repo": "SkyOS",           
-        "releaseType": "release",
-        "private": false
-      }
-    ],
-    "files": [
-      "dist/",            
-      "public/Electron/"
-    ],
-    "directories": {
-      "buildResources": "assets" 
-    },
-    "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "SkyOS"
-    },
-    "mac": {
-      "target": "dmg",
-      "category": "public.app-category.productivity",
-      "icon": "assets/icon.ico"
-    },
-    "linux": {
-      "target": "deb",
-      "category": "Utility",
-      "icon": "assets/icon.ico"
-    }
-
-    
-  },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
-    "electron": "electron .",
-    "electron-pack": "vite build && electron .",
-    "dist": "electron-builder"
+    "build": "vite build"
   },
   "dependencies": {
-    "@electron/remote": "^2.1.2",
     "@headlessui/react": "^2.2.0",
     "@module-federation/enhanced": "^0.11.1",
     "@module-federation/runtime": "^0.11.1",
@@ -98,30 +46,17 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "electron": "^35.0.3",
     "autoprefixer": "10.4.13",
-    "electron-builder": "^26.0.12",
     "postcss": "^8.5.3",
     "postcss-cli": "^10.0.0",
     "tailwindcss": "3.0.24",
     "vite": "^6.2.5"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": ["react-app", "react-app/jest"]
   },
   "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
   }
 }
