@@ -1,22 +1,20 @@
 # Node modules
 /node_modules
 
-# Vite/React build outputs
+# Build outputs
 /dist
 /build
+/out
 
-# PnP
-/.pnp
-.pnp.js
-
-# Testing
-/coverage
+# Electron builder cache
+/*.log
+/*.lock
+/*.map
+/packages
 
 # Env files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env
+.env.*
 
 # System files
 .DS_Store

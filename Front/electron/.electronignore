@@ -1,0 +1,29 @@
+# Tout ce qui ne concerne pas l'app Electron
+../desktop/*
+!../desktop/dist/**
+
+# Node modules inutiles (déjà packagés à part)
+node_modules/
+*.log
+*.md
+test/
+tests/
+__tests__/
+coverage/
+build/
+out/
+
+# Configuration et fichiers inutiles
+.git/
+.gitignore
+.vscode/
+.env*
+.DS_Store
+
+# Autres fichiers potentiellement inutiles
+*.map
+*.lock
+package-lock.json
+yarn.lock
+tsconfig.json
+vite.config.*

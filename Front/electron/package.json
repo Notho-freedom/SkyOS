@@ -1,0 +1,55 @@
+{
+  "name": "skyos-electron",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "author": "Genesis Company",
+  "description": "SkyOS Electron shell for desktop environments.",
+  "build": {
+    "appId": "com.skyos.desktop",
+    "productName": "SkyOS",
+    "copyright": "Copyright © 2025 Genesis Company",
+    "asar": true,
+    "compression": "maximum",
+    "files": [
+      "assets/",
+      "main.js"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Notho-freedom",
+        "repo": "SkyOS",
+        "releaseType": "release",
+        "private": false
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SkyOS"
+    }
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^35.0.3",
+    "electron-builder": "^26.0.12"
+  },
+  "dependencies": {
+    "@electron/remote": "^2.1.2"
+  }
+}
