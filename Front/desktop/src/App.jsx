@@ -1,7 +1,6 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useApp } from './desktop/AppContext';
 import { WebAppProvider } from './Apps/AppManager';
-import DesktopBackground from './desktop/mainscreem/DesktopBackground';
 import TopBar from './desktop/topbar/TopBar';
 import Dock from './desktop/bottombar/Dock';
 import { useTranslation } from "react-i18next";
@@ -11,6 +10,7 @@ import i18n from "./i18n"; // À ne pas supprimer
 import { ThemeProvider } from "./theme/ThemeContext";
 import { ContextMenuProvider } from "./desktop/contextual_menu/ContextMenuContext";
 import { Toaster } from "sonner";
+import DesktopBackground from './desktop/mainscreem/DesktopBackground/DesktopBackground';
 
 const App = () => {
   const { t } = useTranslation();

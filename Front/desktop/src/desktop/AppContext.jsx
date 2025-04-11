@@ -8,7 +8,14 @@ export const AppProvider = ({ children }) => {
   const [top, setTop] = useState('top');
   const [showDock,setShowDock] = useState(true);
   const [error, setError] = useState([{}]);
-
+  const userBgPref = {
+    categories: ['nature', 'futuristic', 'abstract'],
+    autoSwitch: true,
+    switchInterval: 300000,
+    enableBlur: false,
+    blurAmount: 'sm',
+  };
+  
   useEffect(() => {
     top=='bottom'? setShowDock(false):setShowDock(true);
   }, [top])
@@ -20,6 +27,7 @@ export const AppProvider = ({ children }) => {
         top, setTop,
         setShowDock,showDock,
         error, setError,
+        userBgPref,
       }}
     >
       {children}
