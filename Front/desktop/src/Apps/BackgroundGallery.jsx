@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import db from './../desktop/mainscreem/db/backgroundsDb';  // Importer la base de données Dexie
+import db from '../desktop/mainscreem/DesktopBackground/db/backgroundsDb';  // Importer la base de données Dexie
 import Window from '../desktop/window/Window';
 
 const BackgroundGallery = () => {

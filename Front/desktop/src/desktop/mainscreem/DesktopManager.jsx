@@ -1,10 +1,10 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { useApp } from './../AppContext';
+import { useApp } from '../AppContext';
 import { useContextMenu } from "../contextual_menu/ContextMenuContext";
 import { useWindowContext } from '../window/WindowContext';
 //import { useWebApps } from '../../Apps/AppManager';
-import IconGrid from './DesktopIcon';
-import db from './../../Apps/db';
+import IconGrid from './IconsManager/DesktopIcon';
+import db from '../../Apps/db';
 
 const DesktopManager = () => {
   const { createNewFolder, bgRef } = useApp();
