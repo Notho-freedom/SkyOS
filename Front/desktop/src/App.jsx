@@ -11,6 +11,7 @@ import { ThemeProvider } from "./theme/ThemeContext";
 import { ContextMenuProvider } from "./desktop/contextual_menu/ContextMenuContext";
 import { Toaster } from "sonner";
 import DesktopBackground from './desktop/mainscreem/DesktopBackground/DesktopBackground';
+import { BackgroundProvider } from './desktop/mainscreem/DesktopBackground/BackgroundContext';
 
 const App = () => {
   const { t } = useTranslation();
@@ -33,21 +34,23 @@ const App = () => {
   return (
     <WebAppProvider>
       <ThemeProvider>
-        <ContextMenuProvider>
-          <Suspense fallback={<div>{t("loading")}</div>}>
-            <DesktopBackground ref={bgRef}>
-              <Toaster position="top-right" richColors closeButton />
-              {isPageLoaded && (
-                <>
-                  <TopBar />
-                  <Dock />
-                  <DesktopManager />
-                  <WindowManager />
-                </>
-              )}
-            </DesktopBackground>
-          </Suspense>
-        </ContextMenuProvider>
+        <BackgroundProvider>
+          <ContextMenuProvider>
+            <Suspense fallback={<div>{t("loading")}</div>}>
+              <DesktopBackground ref={bgRef}>
+                <Toaster position="top-right" richColors closeButton />
+                {isPageLoaded && (
+                  <>
+                    <TopBar />
+                    <Dock />
+                    <DesktopManager />
+                    <WindowManager />
+                  </>
+                )}
+              </DesktopBackground>
+            </Suspense>
+          </ContextMenuProvider>
+        </BackgroundProvider>
       </ThemeProvider>
     </WebAppProvider>
   );
