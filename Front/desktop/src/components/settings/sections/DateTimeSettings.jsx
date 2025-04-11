@@ -4,29 +4,7 @@ import React from "react"
 import { motion } from "framer-motion"
 import { Clock, Calendar, Globe, Sun, Moon } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
-
-// Textes pour l'internationalisation
-const texts = {
-  dateTime: "Date et heure",
-  setAutomatically: "Régler automatiquement",
-  timeZone: "Fuseau horaire",
-  currentTimeZone: "Fuseau horaire actuel",
-  closestCity: "Ville la plus proche",
-  dateFormat: "Format de date",
-  timeFormat: "Format d'heure",
-  use24Hour: "Utiliser le format 24 heures",
-  showDayOfWeek: "Afficher le jour de la semaine",
-  showDate: "Afficher la date",
-  showAmPm: "Afficher AM/PM",
-  showSeconds: "Afficher les secondes",
-  menuBarClock: "Horloge dans la barre de menus",
-  announce: "Annoncer l'heure",
-  announceInterval: "Intervalle d'annonce",
-  never: "Jamais",
-  hourly: "Toutes les heures",
-  halfHourly: "Toutes les demi-heures",
-  quarterly: "Tous les quarts d'heure",
-}
+import { useTranslation } from "react-i18next"
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -68,6 +46,30 @@ const DateTimeSettings = ({ settingsState, updateSettings, contentVariants }) =>
   const handleAnnounceIntervalChange = (e) => {
     updateDateTimeSetting("announceInterval", e.target.value)
   }
+
+  const { t } = useTranslation()
+
+const texts = {
+  dateTime: t("parametre.dateTime"),
+  setAutomatically: t("parametre.setAutomatically"),
+  timeZone: t("parametre.timeZone"),
+  currentTimeZone: t("parametre.currentTimeZone"),
+  closestCity: t("parametre.closestCity"),
+  dateFormat: t("parametre.dateFormat"),
+  timeFormat: t("parametre.timeFormat"),
+  use24Hour: t("parametre.use24Hour"),
+  showDayOfWeek: t("parametre.showDayOfWeek"),
+  showDate: t("parametre.showDate"),
+  showAmPm: t("parametre.showAmPm"),
+  showSeconds: t("parametre.showSeconds"),
+  menuBarClock: t("parametre.menuBarClock"),
+  announce: t("parametre.announce"),
+  announceInterval: t("parametre.announceInterval"),
+  never: t("parametre.never"),
+  hourly: t("parametre.hourly"),
+  halfHourly: t("parametre.halfHourly"),
+  quarterly: t("parametre.quarterly"),
+}
 
   return (
     <motion.div

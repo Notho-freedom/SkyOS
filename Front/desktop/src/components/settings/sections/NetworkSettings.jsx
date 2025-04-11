@@ -2,26 +2,7 @@
 import { motion } from "framer-motion"
 import { Wifi, WifiOff, Bluetooth, BluetoothOff, Globe } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
-
-// Textes pour l'internationalisation
-const texts = {
-  network: "Réseau",
-  assistant: "Assistant",
-  wifiNetwork: "Wi-Fi",
-  connected: "Connecté",
-  disconnected: "Déconnecté",
-  enabled: "Activé",
-  disabled: "Désactivé",
-  ipAddress: "Adresse IP",
-  subnetMask: "Masque de sous-réseau",
-  router: "Routeur",
-  dns: "DNS",
-  macAddress: "Adresse MAC",
-  bluetooth: "Bluetooth",
-  vpn: "VPN",
-  notConfigured: "Non configuré",
-  configure: "Configurer",
-}
+import { useTranslation } from "react-i18next"
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -48,6 +29,27 @@ const NetworkSettings = ({ settingsState, updateSettings, contentVariants }) => 
     console.log("Configuring VPN...")
     // Logique pour configurer le VPN
   }
+
+  const { t } = useTranslation()
+
+const texts = {
+  network: t("parametre.network"),
+  assistant: t("parametre.assistant"),
+  wifiNetwork: t("parametre.wifiNetwork"),
+  connected: t("parametre.connected"),
+  disconnected: t("parametre.disconnected"),
+  enabled: t("parametre.enabled"),
+  disabled: t("parametre.disabled"),
+  ipAddress: t("parametre.ipAddress"),
+  subnetMask: t("parametre.subnetMask"),
+  router: t("parametre.router"),
+  dns: t("parametre.dns"),
+  macAddress: t("parametre.macAddress"),
+  bluetooth: t("parametre.bluetooth"),
+  vpn: t("parametre.vpn"),
+  notConfigured: t("parametre.notConfigured"),
+  configure: t("parametre.configure"),
+}
 
   return (
     <motion.div
