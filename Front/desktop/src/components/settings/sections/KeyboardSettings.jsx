@@ -2,35 +2,38 @@
 import { motion } from "framer-motion"
 import { Keyboard } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
-
-// Textes pour l'internationalisation
-const texts = {
-  keyboard: "Clavier",
-  keyRepeatRate: "Vitesse de répétition des touches",
-  delayUntilRepeat: "Délai avant répétition",
-  slow: "Lente",
-  fast: "Rapide",
-  long: "Long",
-  short: "Court",
-  useFunctionKeys: "Utiliser les touches F1, F2, etc. comme touches de fonction standard",
-  fnKeyNote: "Appuyez sur la touche Fn pour utiliser les fonctionnalités spéciales imprimées sur chaque touche.",
-  keyboardShortcuts: "Raccourcis clavier",
-  modify: "Modifier",
-  missionControlShortcut: "Mission Control",
-  screenCapture: "Capture d'écran",
-  spotlightShortcut: "Spotlight",
-  input: "Saisie",
-  autoCorrect: "Correction automatique",
-  autoCapitalize: "Majuscules automatiques",
-  doubleSpacePeriod: "Point par double espace",
-}
-
+import { useTranslation } from "react-i18next"
+// Textes pour l'internationalisat
 // Icônes utilisées dans ce composant
 const icons = {
   keyboard: <Keyboard />,
 }
 
 const KeyboardSettings = ({ settingsState, updateSettings, contentVariants }) => {
+
+  const { t } = useTranslation()
+
+const texts = {
+  keyboard: t("parametre.keyboard"),
+  keyRepeatRate: t("parametre.keyRepeatRate"),
+  delayUntilRepeat: t("parametre.delayUntilRepeat"),
+  slow: t("parametre.slow"),
+  fast: t("parametre.fast"),
+  long: t("parametre.long"),
+  short: t("parametre.short"),
+  useFunctionKeys: t("parametre.useFunctionKeys"),
+  fnKeyNote: t("parametre.fnKeyNote"),
+  keyboardShortcuts: t("parametre.keyboardShortcuts"),
+  modify: t("parametre.modify"),
+  missionControlShortcut: t("parametre.missionControlShortcut"),
+  screenCapture: t("parametre.screenCapture"),
+  spotlightShortcut: t("parametre.spotlightShortcut"),
+  input: t("parametre.input"),
+  autoCorrect: t("parametre.autoCorrect"),
+  autoCapitalize: t("parametre.autoCapitalize"),
+  doubleSpacePeriod: t("parametre.doubleSpacePeriod"),
+}
+
   // Fonction pour gérer le changement de vitesse de répétition des touches
   const handleKeyRepeatRateChange = (e) => {
     updateSettings("keyRepeatRate", Number.parseInt(e.target.value))

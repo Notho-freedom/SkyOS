@@ -2,31 +2,8 @@
 import { motion } from "framer-motion"
 import { Battery, BatteryCharging } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
+import { useTranslation } from "react-i18next"
 
-// Textes pour l'internationalisation
-const texts = {
-  battery: "Batterie",
-  charged: "Chargé",
-  timeRemaining: "restantes",
-  showPercentInMenuBar: "Afficher le pourcentage dans la barre de menus",
-  powerSavingOptions: "Options d'économie d'énergie",
-  optimizeVideoStreaming: "Optimiser la lecture vidéo en streaming",
-  enablePowerMode: "Activer le mode économie d'énergie",
-  turnOffDisplayAfter: "Mettre en veille l'écran après",
-  usageHistory: "Historique d'utilisation",
-  last24Hours: "Dernières 24 heures",
-  batteryLevel: "Niveau de batterie",
-  averageUsage: "Utilisation moyenne",
-  chargeCycles: "Cycles de charge",
-  condition: "État",
-  normal: "Normal",
-  perHour: "par heure",
-  minutes2: "2 minutes",
-  minutes5: "5 minutes",
-  minutes10: "10 minutes",
-  minutes30: "30 minutes",
-  never: "Jamais",
-}
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -55,6 +32,32 @@ const BatterySettings = ({ settingsState, updateSettings, contentVariants }) => 
     console.log(`Display sleep time changed to: ${e.target.value}`)
     // Logique pour changer le délai de mise en veille de l'écran
   }
+
+  const { t } = useTranslation()
+
+const texts = {
+  battery: t("parametre.battery"),
+  charged: t("parametre.charged"),
+  timeRemaining: t("parametre.timeRemaining"),
+  showPercentInMenuBar: t("parametre.showPercentInMenuBar"),
+  powerSavingOptions: t("parametre.powerSavingOptions"),
+  optimizeVideoStreaming: t("parametre.optimizeVideoStreaming"),
+  enablePowerMode: t("parametre.enablePowerMode"),
+  turnOffDisplayAfter: t("parametre.turnOffDisplayAfter"),
+  usageHistory: t("parametre.usageHistory"),
+  last24Hours: t("parametre.last24Hours"),
+  batteryLevel: t("parametre.batteryLevel"),
+  averageUsage: t("parametre.averageUsage"),
+  chargeCycles: t("parametre.chargeCycles"),
+  condition: t("parametre.condition"),
+  normal: t("parametre.normal"),
+  perHour: t("parametre.perHour"),
+  minutes2: t("parametre.minutes2"),
+  minutes5: t("parametre.minutes5"),
+  minutes10: t("parametre.minutes10"),
+  minutes30: t("parametre.minutes30"),
+  never: t("parametre.never"),
+}
 
   return (
     <motion.div
