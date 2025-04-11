@@ -7,6 +7,7 @@ export const AppProvider = ({ children }) => {
   const bgRef = useRef();
   const [top, setTop] = useState('top');
   const [showDock,setShowDock] = useState(true);
+  const [error, setError] = useState([{}]);
 
   useEffect(() => {
     top=='bottom'? setShowDock(false):setShowDock(true);
@@ -16,10 +17,9 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider 
       value={{
         bgRef,
-        top,
-        setTop,
-        setShowDock,
-        showDock,
+        top, setTop,
+        setShowDock,showDock,
+        error, setError,
       }}
     >
       {children}
