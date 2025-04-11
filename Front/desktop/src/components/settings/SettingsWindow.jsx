@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useTranslation } from "react-i18next"
 import {
   Globe,
   Monitor,
@@ -22,6 +23,7 @@ import {
   BatteryCharging,
   CalendarIcon,
   ShieldCheck,
+  Palette,
 } from "lucide-react"
 
 // Import des composants de section
@@ -36,23 +38,20 @@ import DisplaySettings from "./sections/DisplaySettings"
 import AccessibilitySettings from "./sections/AccessibilitySettings"
 import DateTimeSettings from "./sections/DateTimeSettings"
 import UserSettings from "./sections/UserSettings"
-import { useTranslation } from "react-i18next"
+import AppearanceSettings from "./sections/AppearanceSettings"
+
 // Import des composants communs
 import { SidebarItem, SettingsIcon } from "./components/UIComponents"
 import { AppHeader, AppTabs, SearchBar } from "./components/HeaderComponents"
 
-
-
 const SettingsWindow = ({ config }) => {
+  const { t } = useTranslation()
   const [viewMode, setViewMode] = useState("grid") // "grid" ou "detail"
   const [activeSection, setActiveSection] = useState("")
   const [activeSubSection, setActiveSubSection] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("apple")
   const [windowSize, setWindowSize] = useState({ width: 900, height: 600 })
-
-
-  const { t } = useTranslation()
 
   const texts = {
     general: t("parametre.general"),
@@ -87,6 +86,9 @@ const SettingsWindow = ({ config }) => {
     timeMachine: t("parametre.timeMachine"),
     startupDisk: t("parametre.startupDisk"),
     wallpaper: t("parametre.wallpaper"),
+    back: t("parametre.back"),
+    settingsTitle: t("parametre.settingsTitle"),
+    appearance: t("parametre.appearance"),
   }
 
   // État global pour les toggles et autres paramètres
@@ -133,7 +135,6 @@ const SettingsWindow = ({ config }) => {
   // Effet pour détecter les changements de taille de fenêtre
   useEffect(() => {
     const handleResize = () => {
-      // Simuler le redimensionnement de la fenêtre
       const width = Math.min(1200, Math.max(800, window.innerWidth * 0.7))
       const height = Math.min(800, Math.max(600, window.innerHeight * 0.7))
       setWindowSize({ width, height })
@@ -196,10 +197,10 @@ const SettingsWindow = ({ config }) => {
     },
   }
 
-
   // Éléments de la sidebar
   const sidebarItems = [
     { id: "general", label: texts.general, icon: <Globe className="w-4 h-4" /> },
+    { id: "appearance", label: texts.appearance, icon: <Palette className="w-4 h-4" /> },
     { id: "desktop", label: texts.desktop, icon: <Monitor className="w-4 h-4" /> },
     { id: "wallpaper", label: texts.wallpaper, icon: <Layout className="w-4 h-4" /> },
     { id: "accessibility", label: texts.accessibility, icon: <Accessibility className="w-4 h-4" /> },
@@ -216,6 +217,7 @@ const SettingsWindow = ({ config }) => {
   // Éléments de la grille principale
   const settingsItems = [
     { id: "general", label: texts.general, icon: <Globe className="w-6 h-6 text-white" />, color: "bg-gray-500" },
+    { id: "appearance", label: texts.appearance, icon: <Palette className="w-6 h-6 text-white" />, color: "bg-purple-500" },
     { id: "desktop", label: texts.desktop, icon: <Monitor className="w-6 h-6 text-white" />, color: "bg-green-500" },
     { id: "wallpaper", label: texts.wallpaper, icon: <Layout className="w-6 h-6 text-white" />, color: "bg-blue-400" },
     { id: "network", label: texts.network, icon: <Network className="w-6 h-6 text-white" />, color: "bg-blue-400" },
@@ -292,6 +294,14 @@ const SettingsWindow = ({ config }) => {
       case "security":
         return (
           <SecuritySettings
+            settingsState={settingsState}
+            updateSettings={updateSettings}
+            contentVariants={contentVariants}
+          />
+        )
+      case "appearance":
+        return (
+          <AppearanceSettings
             settingsState={settingsState}
             updateSettings={updateSettings}
             contentVariants={contentVariants}
@@ -383,7 +393,6 @@ const SettingsWindow = ({ config }) => {
               className="grid auto-rows-fr gap-4"
               style={{
                 gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
-                display: "grid",
               }}
             >
               {settingsItems.map((item) => (
