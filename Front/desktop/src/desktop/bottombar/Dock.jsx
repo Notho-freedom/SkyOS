@@ -89,7 +89,7 @@ const Dock = () => {
       }}
     >
       <DockBar apps={apps} loading={loading} visibleAppsCount={visibleAppsCount} dockRef={dockRef} addWindow={addWindow} />
-      <Sphere action={() => addApp('Chatbot')} />
+      <Sphere action={() => addApp('IA')} />
       <DockBar apps={apps} loading={loading} visibleAppsCount={visibleAppsCount} dockRef={dockRef} addWindow={addWindow} />
     </motion.div>
   )
