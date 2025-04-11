@@ -4,6 +4,7 @@ import { showNotification } from '../../notify/notifications';
 import fallback from './fallback/fallback.jpeg';
 import { useApp } from '../../AppContext';
 
+// Fonction pour convertir un blob en DataURL
 const blobToDataURL = (blob) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -115,6 +116,26 @@ const useBackgroundManager = () => {
     setCurrentBg(nextBg);
   }, [nextBg]);
 
+  const changeBackgroundManually = useCallback(async (file) => {
+    if (!file) return;
+
+    const dataUrl = await blobToDataURL(file);
+    setCurrentBg(dataUrl);
+    setNextBg(dataUrl);
+
+    const savedBackgrounds = await db.getAllBackgrounds();
+    const alreadySaved = savedBackgrounds.some(bg => bg.dataUrl === dataUrl);
+
+    if (!alreadySaved) {
+      if (savedBackgrounds.length >= 10) {
+        await db.deleteOldest();
+      }
+      await db.addBackground(dataUrl);
+      showNotification('Manuel', 'Fond d\'écran changé et sauvegardé', 'success');
+    }
+
+  }, []);
+
   useEffect(() => {
     if (!userBgPref?.autoSwitch) return;
     const interval = setInterval(refreshBackground, userBgPref.switchInterval || 300000);
@@ -143,6 +164,7 @@ const useBackgroundManager = () => {
     handleImageLoad,
     refreshBackground,
     saveCurrentBackground,
+    changeBackgroundManually,
     blurEnabled: userBgPref?.enableBlur,
     blurAmount: userBgPref?.blurAmount || 'md',
   };

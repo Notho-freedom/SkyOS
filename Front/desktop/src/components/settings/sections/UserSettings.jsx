@@ -4,29 +4,8 @@ import React from "react"
 import { motion } from "framer-motion"
 import { User, Users, UserPlus, Settings, Key, Lock, Shield } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
+import { useTranslation } from "react-i18next"
 
-// Textes pour l'internationalisation
-const texts = {
-  users: "Utilisateurs et groupes",
-  currentUser: "Utilisateur actuel",
-  admin: "Administrateur",
-  loginItems: "Éléments de connexion",
-  loginItemsDescription: "Applications qui démarrent automatiquement à la connexion",
-  passwordSettings: "Paramètres de mot de passe",
-  changePassword: "Changer le mot de passe",
-  requirePasswordAfterSleep: "Exiger le mot de passe après la mise en veille",
-  automaticLogin: "Connexion automatique",
-  guestUser: "Utilisateur invité",
-  guestUserDescription: "Permet aux invités d'utiliser l'ordinateur sans compte",
-  otherUsers: "Autres utilisateurs",
-  addUser: "Ajouter un utilisateur",
-  loginOptions: "Options de connexion",
-  showUserList: "Afficher la liste des utilisateurs",
-  showHints: "Afficher les indices de mot de passe",
-  showRestartButtons: "Afficher les boutons de redémarrage",
-  fastUserSwitching: "Changement rapide d'utilisateur",
-  fastUserSwitchingDescription: "Permet de changer d'utilisateur sans fermer les applications",
-}
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -40,6 +19,31 @@ const icons = {
 }
 
 const UserSettings = ({ settingsState, updateSettings, contentVariants }) => {
+  
+  const { t } = useTranslation()
+
+  const texts = {
+    users: t("parametre.users"),
+    currentUser: t("parametre.currentUser"),
+    admin: t("parametre.admin"),
+    loginItems: t("parametre.loginItems"),
+    loginItemsDescription: t("parametre.loginItemsDescription"),
+    passwordSettings: t("parametre.passwordSettings"),
+    changePassword: t("parametre.changePassword"),
+    requirePasswordAfterSleep: t("parametre.requirePasswordAfterSleep"),
+    automaticLogin: t("parametre.automaticLogin"),
+    guestUser: t("parametre.guestUser"),
+    guestUserDescription: t("parametre.guestUserDescription"),
+    otherUsers: t("parametre.otherUsers"),
+    addUser: t("parametre.addUser"),
+    loginOptions: t("parametre.loginOptions"),
+    showUserList: t("parametre.showUserList"),
+    showHints: t("parametre.showHints"),
+    showRestartButtons: t("parametre.showRestartButtons"),
+    fastUserSwitching: t("parametre.fastUserSwitching"),
+    fastUserSwitchingDescription: t("parametre.fastUserSwitchingDescription"),
+  }
+
   // État local pour les paramètres utilisateur
   const [userSettings, setUserSettings] = React.useState({
     requirePasswordAfterSleep: true,
