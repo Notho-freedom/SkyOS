@@ -2,19 +2,7 @@
 import { motion } from "framer-motion"
 import { Globe, Monitor, Dock, Layout } from "lucide-react"
 import { ContentItem } from "../components/UIComponents"
-
-// Textes pour l'internationalisation
-const texts = {
-  wallpaper: "Fond d'écran",
-  chooseDesktop: "Choisir votre fond d'écran",
-  screenSaver: "Économiseur d'écran",
-  setupScreenSaver: "Configurer votre économiseur d'écran",
-  dockAndMenuBar: "Dock et barre de menus",
-  customizeDock: "Personnaliser votre dock et barre de menus",
-  missionControl: "Mission Control",
-  organizeWindows: "Organiser vos fenêtres",
-}
-
+import { useTranslation } from "react-i18next"
 // Icônes utilisées dans ce composant
 const icons = {
   globe: <Globe />,
@@ -24,6 +12,20 @@ const icons = {
 }
 
 const GeneralSettings = ({ settingsState, updateSettings, contentVariants, navigateToSubSection }) => {
+
+  const { t } = useTranslation()
+
+const texts = {
+  wallpaper: t("parametre.wallpaper"),
+  chooseDesktop: t("parametre.chooseDesktop"),
+  screenSaver: t("parametre.screenSaver"),
+  setupScreenSaver: t("parametre.setupScreenSaver"),
+  dockAndMenuBar: t("parametre.dockAndMenuBar"),
+  customizeDock: t("parametre.customizeDock"),
+  missionControl: t("parametre.missionControl"),
+  organizeWindows: t("parametre.organizeWindows"),
+}
+
   return (
     <motion.div
       key="default"

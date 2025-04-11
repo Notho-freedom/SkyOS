@@ -4,28 +4,8 @@ import React from "react"
 import { motion } from "framer-motion"
 import { Monitor, LayoutGrid, Maximize, Minimize, SunMoon } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
+import { useTranslation } from "react-i18next"
 
-// Textes pour l'internationalisation
-const texts = {
-  displays: "Moniteurs",
-  arrangement: "Disposition",
-  dragDisplays: "Faites glisser les moniteurs pour réorganiser leur disposition",
-  nightShift: "Night Shift",
-  nightShiftDescription: "Réduit la lumière bleue pour un meilleur sommeil",
-  schedule: "Programmation",
-  sunset: "Du coucher au lever du soleil",
-  custom: "Personnalisée",
-  colorTemperature: "Température de couleur",
-  less: "Moins chaude",
-  more: "Plus chaude",
-  resolution: "Résolution",
-  scaled: "À l'échelle",
-  default: "Par défaut pour l'écran",
-  brightness: "Luminosité",
-  automaticBrightness: "Ajuster automatiquement la luminosité",
-  trueTone: "True Tone",
-  trueToneDescription: "Ajuste automatiquement la balance des couleurs selon l'éclairage ambiant",
-}
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -37,6 +17,31 @@ const icons = {
 }
 
 const DisplaySettings = ({ settingsState, updateSettings, contentVariants }) => {
+
+  
+const { t } = useTranslation()
+
+const texts = {
+  displays: t("parametre.displays"),
+  arrangement: t("parametre.arrangement"),
+  dragDisplays: t("parametre.dragDisplays"),
+  nightShift: t("parametre.nightShift"),
+  nightShiftDescription: t("parametre.nightShiftDescription"),
+  schedule: t("parametre.schedule"),
+  sunset: t("parametre.sunset"),
+  custom: t("parametre.custom"),
+  colorTemperature: t("parametre.colorTemperature"),
+  less: t("parametre.less"),
+  more: t("parametre.more"),
+  resolution: t("parametre.resolution"),
+  scaled: t("parametre.scaled"),
+  default: t("parametre.default"),
+  brightness: t("parametre.brightness"),
+  automaticBrightness: t("parametre.automaticBrightness"),
+  trueTone: t("parametre.trueTone"),
+  trueToneDescription: t("parametre.trueToneDescription"),
+}
+
   // État local pour les paramètres d'affichage
   const [displaySettings, setDisplaySettings] = React.useState({
     nightShift: true,

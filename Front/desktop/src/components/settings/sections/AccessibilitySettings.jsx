@@ -4,37 +4,9 @@ import React from "react"
 import { motion } from "framer-motion"
 import { Eye, Ear, MousePointer, Keyboard, Mic, Speaker, Monitor } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
+import { useTranslation } from "react-i18next"
 
-// Textes pour l'internationalisation
-const texts = {
-  accessibility: "Accessibilité",
-  vision: "Vision",
-  voiceOver: "VoiceOver",
-  voiceOverDescription: "Lecteur d'écran pour les personnes malvoyantes",
-  zoom: "Zoom",
-  zoomDescription: "Agrandir l'écran",
-  displaySettings: "Paramètres d'affichage",
-  increaseContrast: "Augmenter le contraste",
-  reduceTransparency: "Réduire la transparence",
-  reduceMotion: "Réduire les animations",
-  hearing: "Audition",
-  closedCaptions: "Sous-titres",
-  closedCaptionsDescription: "Afficher les sous-titres pour le contenu audio",
-  audioDescription: "Description audio",
-  audioDescriptionDescription: "Narration des éléments visuels",
-  motor: "Motricité",
-  voiceControl: "Contrôle vocal",
-  voiceControlDescription: "Contrôler l'ordinateur avec la voix",
-  switchControl: "Contrôle par commutateur",
-  switchControlDescription: "Utiliser des commutateurs pour naviguer",
-  keyboard: "Clavier",
-  stickyKeys: "Touches rémanentes",
-  stickyKeysDescription: "Appuyer sur les touches de modification une à la fois",
-  slowKeys: "Touches lentes",
-  slowKeysDescription: "Ajuster le délai entre l'appui et l'acceptation d'une touche",
-  general: "Général",
-  shortcutsEnabled: "Raccourcis d'accessibilité activés",
-}
+
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -48,6 +20,41 @@ const icons = {
 }
 
 const AccessibilitySettings = ({ settingsState, updateSettings, contentVariants }) => {
+
+
+  const { t } = useTranslation()
+
+// Textes pour l'internationalisation
+  const texts = {
+    accessibility: t("parametre.accessibility"),
+    vision: t("parametre.vision"),
+    voiceOver: t("parametre.voiceOver"),
+    voiceOverDescription: t("parametre.voiceOverDescription"),
+    zoom: t("parametre.zoom"),
+    zoomDescription: t("parametre.zoomDescription"),
+    displaySettings: t("parametre.displaySettings"),
+    increaseContrast: t("parametre.increaseContrast"),
+    reduceTransparency: t("parametre.reduceTransparency"),
+    reduceMotion: t("parametre.reduceMotion"),
+    hearing: t("parametre.hearing"),
+    closedCaptions: t("parametre.closedCaptions"),
+    closedCaptionsDescription: t("parametre.closedCaptionsDescription"),
+    audioDescription: t("parametre.audioDescription"),
+    audioDescriptionDescription: t("parametre.audioDescriptionDescription"),
+    motor: t("parametre.motor"),
+    voiceControl: t("parametre.voiceControl"),
+    voiceControlDescription: t("parametre.voiceControlDescription"),
+    switchControl: t("parametre.switchControl"),
+    switchControlDescription: t("parametre.switchControlDescription"),
+    keyboard: t("parametre.keyboard"),
+    stickyKeys: t("parametre.stickyKeys"),
+    stickyKeysDescription: t("parametre.stickyKeysDescription"),
+    slowKeys: t("parametre.slowKeys"),
+    slowKeysDescription: t("parametre.slowKeysDescription"),
+    general: t("parametre.general"),
+    shortcutsEnabled: t("parametre.shortcutsEnabled"),
+  }
+
   // État local pour les paramètres d'accessibilité
   const [accessibilitySettings, setAccessibilitySettings] = React.useState({
     voiceOver: false,

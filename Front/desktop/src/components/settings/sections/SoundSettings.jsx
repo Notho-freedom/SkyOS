@@ -2,23 +2,7 @@
 import { motion } from "framer-motion"
 import { Volume, VolumeX } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
-
-// Textes pour l'internationalisation
-const texts = {
-  sound: "Son",
-  outputVolume: "Volume de sortie",
-  mute: "Couper le son",
-  showVolumeInMenuBar: "Afficher le volume dans la barre de menus",
-  outputDevice: "Périphérique de sortie",
-  internalSpeakers: "Haut-parleurs intégrés",
-  defaultDevice: "Périphérique par défaut",
-  hdmi: "HDMI",
-  notConnected: "Non connecté",
-  soundEffects: "Effets sonores",
-  playSoundEffects: "Jouer les effets sonores",
-  playStartupSound: "Jouer un son au démarrage",
-  alertVolume: "Volume des alertes",
-}
+import { useTranslation } from "react-i18next"
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -27,6 +11,25 @@ const icons = {
 }
 
 const SoundSettings = ({ settingsState, updateSettings, contentVariants }) => {
+
+  const { t } = useTranslation()
+
+const texts = {
+  sound: t("parametre.sound"),
+  outputVolume: t("parametre.outputVolume"),
+  mute: t("parametre.mute"),
+  showVolumeInMenuBar: t("parametre.showVolumeInMenuBar"),
+  outputDevice: t("parametre.outputDevice"),
+  internalSpeakers: t("parametre.internalSpeakers"),
+  defaultDevice: t("parametre.defaultDevice"),
+  hdmi: t("parametre.hdmi"),
+  notConnected: t("parametre.notConnected"),
+  soundEffects: t("parametre.soundEffects"),
+  playSoundEffects: t("parametre.playSoundEffects"),
+  playStartupSound: t("parametre.playStartupSound"),
+  alertVolume: t("parametre.alertVolume"),
+}
+
   // Fonction pour gérer le changement d'état du mode muet
   const handleMuteToggle = (value) => {
     updateSettings("muteSound", value)

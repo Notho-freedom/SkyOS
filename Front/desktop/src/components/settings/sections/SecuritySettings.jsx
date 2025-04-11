@@ -2,33 +2,7 @@
 import { motion } from "framer-motion"
 import { Shield, ShieldCheck, Globe, User, CalendarIcon, BellRing } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
-
-// Textes pour l'internationalisation
-const texts = {
-  security: "Sécurité et confidentialité",
-  general: "Général",
-  requirePasswordAfterSleep: "Exiger le mot de passe après la mise en veille",
-  sleepInactivityNote: "Votre Mac est configuré pour se mettre en veille après 10 minutes d'inactivité",
-  allowAppDownloadedFrom: "Autoriser les applications téléchargées de",
-  appStore: "App Store",
-  identifiedDevelopers: "App Store et développeurs identifiés",
-  anywhere: "N'importe où",
-  fileVault: "FileVault",
-  fileVaultEnabled: 'FileVault est activé pour le disque "Macintosh HD"',
-  diskEncrypted: "Votre disque est chiffré",
-  fileVaultDescription:
-    "FileVault chiffre le contenu de votre Mac. Si votre Mac est perdu ou volé, le chiffrement empêche l'accès non autorisé à vos informations.",
-  firewall: "Pare-feu",
-  firewallOn: "Pare-feu: Activé",
-  firewallDescription: "Les connexions entrantes sont bloquées pour certaines applications et services",
-  options: "Options",
-  privacy: "Confidentialité",
-  location: "Localisation",
-  contacts: "Contacts",
-  calendar: "Calendrier",
-  notifications: "Notifications",
-  disabled: "Désactiver",
-}
+import { useTranslation } from "react-i18next"
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -41,6 +15,34 @@ const icons = {
 }
 
 const SecuritySettings = ({ settingsState, updateSettings, contentVariants }) => {
+
+  const { t } = useTranslation()
+
+const texts = {
+  security: t("parametre.security"),
+  general: t("parametre.general"),
+  requirePasswordAfterSleep: t("parametre.requirePasswordAfterSleep"),
+  sleepInactivityNote: t("parametre.sleepInactivityNote"),
+  allowAppDownloadedFrom: t("parametre.allowAppDownloadedFrom"),
+  appStore: t("parametre.appStore"),
+  identifiedDevelopers: t("parametre.identifiedDevelopers"),
+  anywhere: t("parametre.anywhere"),
+  fileVault: t("parametre.fileVault"),
+  fileVaultEnabled: t("parametre.fileVaultEnabled"),
+  diskEncrypted: t("parametre.diskEncrypted"),
+  fileVaultDescription: t("parametre.fileVaultDescription"),
+  firewall: t("parametre.firewall"),
+  firewallOn: t("parametre.firewallOn"),
+  firewallDescription: t("parametre.firewallDescription"),
+  options: t("parametre.options"),
+  privacy: t("parametre.privacy"),
+  location: t("parametre.location"),
+  contacts: t("parametre.contacts"),
+  calendar: t("parametre.calendar"),
+  notifications: t("parametre.notifications"),
+  disabled: t("parametre.disabled"),
+}
+
   // Fonction pour gérer l'exigence du mot de passe après la mise en veille
   const handleRequirePasswordAfterSleepToggle = (value) => {
     updateSettings("requirePasswordAfterSleep", value)
