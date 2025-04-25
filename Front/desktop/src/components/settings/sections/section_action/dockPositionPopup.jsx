@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import { useApp } from "../../../../desktop/AppContext"
+import React, { useState, useEffect } from 'react';
+import { useContextMenu } from "../../../../desktop/contextual_menu/ContextMenuContext"
 
-const DockPositionPopup = ({ onClose, onSave }) => {
+const DockPositionPopup = ({ currentPosition, onClose, onSave }) => {
   const [position, setPosition] = useState('bottom'); // Default position
+  const { setTop, setShowDock } = useApp();
 
-  const handlePositionChange = (event) => {
-    setPosition(event.target.value);
+  useEffect(() => {
+    setPosition(currentPosition || 'bottom');
+  }, [currentPosition]);
+
+  const handlePositionChange = (e) => {
+    setPosition(e.target.value);
   };
 
   const handleSave = () => {
     onSave(position);
+    setTop(position);      // Applique la position choisie au dock
+    setShowDock(true);     // Montre le dock (si tu veux que ce soit automatique ici)
     onClose();
   };
 
