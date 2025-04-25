@@ -5,8 +5,7 @@ import { motion } from "framer-motion"
 import { Eye, Ear, MousePointer, Keyboard, Mic, Speaker, Monitor } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
 import { useTranslation } from "react-i18next"
-
-
+import i18n from "../../../i18n"
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -20,11 +19,9 @@ const icons = {
 }
 
 const AccessibilitySettings = ({ settingsState, updateSettings, contentVariants }) => {
-
-
   const { t } = useTranslation()
 
-// Textes pour l'internationalisation
+  // Textes pour l'internationalisation
   const texts = {
     accessibility: t("parametre.accessibility"),
     vision: t("parametre.vision"),
@@ -53,6 +50,10 @@ const AccessibilitySettings = ({ settingsState, updateSettings, contentVariants 
     slowKeysDescription: t("parametre.slowKeysDescription"),
     general: t("parametre.general"),
     shortcutsEnabled: t("parametre.shortcutsEnabled"),
+    language: t("parametre.language"),
+    currentLanguage: t("parametre.currentLanguage"),
+    autoDetectLanguage: t("parametre.autoDetectLanguage"),
+    autoDetectLanguageDescription: t("parametre.autoDetectLanguageDescription"),
   }
 
   // État local pour les paramètres d'accessibilité
@@ -69,6 +70,7 @@ const AccessibilitySettings = ({ settingsState, updateSettings, contentVariants 
     stickyKeys: false,
     slowKeys: false,
     shortcutsEnabled: true,
+    autoDetectLanguage: false,
   })
 
   // Fonction pour mettre à jour les paramètres d'accessibilité
@@ -90,6 +92,56 @@ const AccessibilitySettings = ({ settingsState, updateSettings, contentVariants 
     >
       <div className="p-6">
         <SectionTitle title={texts.accessibility} />
+
+        <SectionCard className="mb-6">
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="text-sm font-medium">{t("parametre.language")}</h3>
+          </div>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm">{t("parametre.currentLanguage")}</span>
+              <select
+                className="p-2 border rounded-md text-sm"
+                value={settingsState?.system?.language || i18n.language}
+                onChange={(e) => {
+                  // Update settings
+                  updateSettings({
+                    type: "SET_LANGUAGE",
+                    payload: e.target.value,
+                  })
+                  // Change i18n language
+                  i18n.changeLanguage(e.target.value)
+                }}
+              >
+                <option value="en-US">English</option>
+                <option value="fr-FR">Français</option>
+              </select>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm font-medium block">{t("parametre.autoDetectLanguage")}</span>
+                <span className="text-xs text-gray-500">{t("parametre.autoDetectLanguageDescription")}</span>
+              </div>
+              <ToggleSwitch
+                isEnabled={accessibilitySettings.autoDetectLanguage || false}
+                onChange={(value) => {
+                  updateAccessibilitySetting("autoDetectLanguage", value)
+                  if (value) {
+                    // Get browser language
+                    const browserLang = navigator.language
+                    // Update settings
+                    updateSettings({
+                      type: "SET_LANGUAGE",
+                      payload: browserLang,
+                    })
+                    // Change i18n language
+                    i18n.changeLanguage(browserLang)
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </SectionCard>
 
         <SectionCard className="mb-6">
           <div className="p-4 border-b border-gray-200">
@@ -241,6 +293,7 @@ const AccessibilitySettings = ({ settingsState, updateSettings, contentVariants 
             </div>
           </div>
         </SectionCard>
+        
       </div>
     </motion.div>
   )
