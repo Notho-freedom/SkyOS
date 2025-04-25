@@ -428,11 +428,11 @@ const SettingsWindow = ({ config }) => {
       >
         {/* Search bar */}
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
-
-        <div className="flex flex-1 overflow-hidden">
+  
+        <div className="flex flex-1 min-h-full"> {/* Ajout de min-h-0 pour éviter les problèmes de débordement */}
           {/* Sidebar */}
           <motion.div
-            className="w-56 bg-gray-100/80 border-r border-gray-200 overflow-y-auto py-2 px-2"
+            className="w-56 bg-gray-100/80 border-r border-gray-200 overflow-y-auto py-2 px-2 flex-shrink-0"
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.1 }}
@@ -456,10 +456,14 @@ const SettingsWindow = ({ config }) => {
               />
             ))}
           </motion.div>
-
+  
           {/* Content area */}
-          <div className="flex-1 overflow-hidden">
-            <AnimatePresence mode="wait">{renderDetailContent()}</AnimatePresence>
+          <div className="flex-1 min-h-full overflow-auto"> {/* Ajout de min-h-0 et overflow-auto */}
+            <AnimatePresence mode="wait">
+              <motion.div className="h-full"> {/* Nouveau conteneur avec h-full */}
+                {renderDetailContent()}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </motion.div>

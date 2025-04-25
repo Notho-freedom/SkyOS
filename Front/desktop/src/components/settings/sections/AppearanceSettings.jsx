@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import {
   Palette,
@@ -17,43 +17,9 @@ import {
   Sparkles,
 } from "lucide-react"
 import { SectionTitle, SectionCard, ToggleSwitch } from "../components/UIComponents"
-
-// Textes pour l'internationalisation
-const texts = {
-  appearance: "Apparence",
-  theme: "Thème",
-  light: "Clair",
-  dark: "Sombre",
-  auto: "Automatique",
-  autoThemeDescription: "Utilise le thème clair pendant la journée et le thème sombre la nuit",
-  accentColor: "Couleur d'accent",
-  fonts: "Polices",
-  systemFont: "Police système",
-  fontFamily: "Famille de police",
-  fontSize: "Taille de police",
-  smaller: "Plus petit",
-  larger: "Plus grand",
-  fontWeight: "Épaisseur de police",
-  regular: "Normal",
-  medium: "Moyen",
-  bold: "Gras",
-  visualEffects: "Effets visuels",
-  transparency: "Transparence",
-  animation: "Animation",
-  reduceMotion: "Réduire les animations",
-  reduceTransparency: "Réduire la transparence",
-  highContrast: "Contraste élevé",
-  preview: "Aperçu",
-  apply: "Appliquer",
-  reset: "Réinitialiser",
-  custom: "Personnalisé",
-  fontSmoothing: "Lissage de police",
-  enableFontSmoothing: "Activer le lissage de police",
-  interfaceDensity: "Densité de l'interface",
-  compact: "Compacte",
-  comfortable: "Confortable",
-  spacious: "Spacieuse",
-}
+import { useTheme } from "../../../theme/ThemeContext.jsx"
+import { useSettings } from "../../../config/settingsContext"
+import { useTranslation } from "react-i18next"
 
 // Icônes utilisées dans ce composant
 const icons = {
@@ -71,41 +37,121 @@ const icons = {
   sparkles: <Sparkles />,
 }
 
-// Options de polices disponibles
-const fontFamilies = [
-  { name: "System UI", value: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif" },
-  { name: "SF Pro", value: "'SF Pro', sans-serif" },
-  { name: "Helvetica Neue", value: "'Helvetica Neue', Helvetica, Arial, sans-serif" },
-  { name: "Roboto", value: "'Roboto', sans-serif" },
-  { name: "Inter", value: "'Inter', sans-serif" },
-]
+// Mocked defaultTheme and darkTheme for demonstration purposes.
+// In a real application, these would likely be defined elsewhere and imported.
+const defaultTheme = {
+  name: "light",
+  colors: {
+    primary: "#2563eb", // Default blue color
+  },
+  fontFamily: "sans-serif",
+  fontSize: 16,
+  fontWeight: "regular",
+  reduceMotion: false,
+  reduceTransparency: false,
+  highContrast: false,
+  fontSmoothing: true,
+  interfaceDensity: "comfortable",
+}
 
-// Couleurs d'accent disponibles
-const accentColors = [
-  { name: "Bleu", value: "bg-blue-500", hover: "bg-blue-600", color: "#3b82f6" },
-  { name: "Violet", value: "bg-purple-500", hover: "bg-purple-600", color: "#8b5cf6" },
-  { name: "Rose", value: "bg-pink-500", hover: "bg-pink-600", color: "#ec4899" },
-  { name: "Rouge", value: "bg-red-500", hover: "bg-red-600", color: "#ef4444" },
-  { name: "Orange", value: "bg-orange-500", hover: "bg-orange-600", color: "#f97316" },
-  { name: "Vert", value: "bg-green-500", hover: "bg-green-600", color: "#22c55e" },
-  { name: "Cyan", value: "bg-cyan-500", hover: "bg-cyan-600", color: "#06b6d4" },
-  { name: "Gris", value: "bg-gray-500", hover: "bg-gray-600", color: "#6b7280" },
-]
+const darkTheme = {
+  name: "dark",
+  colors: {
+    primary: "#9333ea", // Default purple color
+  },
+  fontFamily: "sans-serif",
+  fontSize: 16,
+  fontWeight: "regular",
+  reduceMotion: false,
+  reduceTransparency: false,
+  highContrast: false,
+  fontSmoothing: true,
+  interfaceDensity: "comfortable",
+}
+
+// Mocked showNotification function for demonstration purposes.
+const showNotification = (title, message, type) => {
+  console.log(`Notification: ${title} - ${message} (${type})`)
+  // In a real application, this would display a user-visible notification.
+}
 
 const AppearanceSettings = ({ settingsState, updateSettings, contentVariants }) => {
+  const { theme, setTheme, toggleDarkMode, updateThemeProperty, fontFamilies, accentColors } = useTheme()
+  const { state, dispatch } = useSettings()
+  const { t } = useTranslation()
+
+  // Textes pour l'internationalisation
+  const texts = {
+    appearance: t("parametre.appearance", "Apparence"),
+    theme: t("parametre.theme", "Thème"),
+    light: t("parametre.light", "Clair"),
+    dark: t("parametre.dark", "Sombre"),
+    auto: t("parametre.auto", "Automatique"),
+    autoThemeDescription: t(
+      "parametre.autoThemeDescription",
+      "Utilise le thème clair pendant la journée et le thème sombre la nuit",
+    ),
+    accentColor: t("parametre.accentColor", "Couleur d'accent"),
+    fonts: t("parametre.fonts", "Polices"),
+    systemFont: t("parametre.systemFont", "Police système"),
+    fontFamily: t("parametre.fontFamily", "Famille de police"),
+    fontSize: t("parametre.fontSize", "Taille de police"),
+    smaller: t("parametre.smaller", "Plus petit"),
+    larger: t("parametre.larger", "Plus grand"),
+    fontWeight: t("parametre.fontWeight", "Épaisseur de police"),
+    regular: t("parametre.regular", "Normal"),
+    medium: t("parametre.medium", "Moyen"),
+    bold: t("parametre.bold", "Gras"),
+    visualEffects: t("parametre.visualEffects", "Effets visuels"),
+    transparency: t("parametre.transparency", "Transparence"),
+    animation: t("parametre.animation", "Animation"),
+    reduceMotion: t("parametre.reduceMotion", "Réduire les animations"),
+    reduceTransparency: t("parametre.reduceTransparency", "Réduire la transparence"),
+    highContrast: t("parametre.highContrast", "Contraste élevé"),
+    preview: t("parametre.preview", "Aperçu"),
+    apply: t("parametre.apply", "Appliquer"),
+    reset: t("parametre.reset", "Réinitialiser"),
+    custom: t("parametre.custom", "Personnalisé"),
+    fontSmoothing: t("parametre.fontSmoothing", "Lissage de police"),
+    enableFontSmoothing: t("parametre.enableFontSmoothing", "Activer le lissage de police"),
+    interfaceDensity: t("parametre.interfaceDensity", "Densité de l'interface"),
+    compact: t("parametre.compact", "Compacte"),
+    comfortable: t("parametre.comfortable", "Confortable"),
+    spacious: t("parametre.spacious", "Spacieuse"),
+    cancel: t("parametre.cancel", "Annuler"),
+    customizeExperience: t("parametre.customizeExperience", "Personnalisez votre expérience"),
+    adaptAppearance: t("parametre.adaptAppearance", "Adaptez l'apparence de SKYOS à votre style et à vos préférences."),
+  }
+
   // État local pour les paramètres d'apparence
   const [appearanceSettings, setAppearanceSettings] = useState({
-    theme: "auto", // 'light', 'dark', 'auto'
-    accentColor: accentColors[0],
-    fontFamily: fontFamilies[0],
-    fontSize: 16,
-    fontWeight: "regular", // 'regular', 'medium', 'bold'
-    reduceMotion: false,
-    reduceTransparency: false,
-    highContrast: false,
-    fontSmoothing: true,
-    interfaceDensity: "comfortable", // 'compact', 'comfortable', 'spacious'
+    theme: theme.name === "dark" ? "dark" : "light", // 'light', 'dark', 'auto'
+    accentColor: accentColors.find((color) => color.color === theme.colors.primary) || accentColors[0],
+    fontFamily: fontFamilies.find((font) => font.value === theme.fontFamily) || fontFamilies[0],
+    fontSize: theme.fontSize,
+    fontWeight: theme.fontWeight, // 'regular', 'medium', 'bold'
+    reduceMotion: theme.reduceMotion,
+    reduceTransparency: theme.reduceTransparency,
+    highContrast: theme.highContrast,
+    fontSmoothing: theme.fontSmoothing,
+    interfaceDensity: theme.interfaceDensity, // 'compact', 'comfortable', 'spacious'
   })
+
+  // Synchroniser les paramètres locaux avec le thème global
+  useEffect(() => {
+    setAppearanceSettings({
+      theme: theme.name === "dark" ? "dark" : "light",
+      accentColor: accentColors.find((color) => color.color === theme.colors.primary) || accentColors[0],
+      fontFamily: fontFamilies.find((font) => font.value === theme.fontFamily) || fontFamilies[0],
+      fontSize: theme.fontSize,
+      fontWeight: theme.fontWeight,
+      reduceMotion: theme.reduceMotion,
+      reduceTransparency: theme.reduceTransparency,
+      highContrast: theme.highContrast,
+      fontSmoothing: theme.fontSmoothing,
+      interfaceDensity: theme.interfaceDensity,
+    })
+  }, [theme, accentColors, fontFamilies])
 
   // Fonction pour mettre à jour les paramètres d'apparence
   const updateAppearanceSetting = (key, value) => {
@@ -116,46 +162,78 @@ const AppearanceSettings = ({ settingsState, updateSettings, contentVariants }) 
   }
 
   // Fonction pour gérer le changement de thème
-  const handleThemeChange = (theme) => {
-    updateAppearanceSetting("theme", theme)
+  const handleThemeChange = (themeType) => {
+    updateAppearanceSetting("theme", themeType)
+
+    if (themeType === "light" || themeType === "dark") {
+      setTheme({
+        ...theme,
+        name: themeType,
+        colors: themeType === "dark" ? darkTheme.colors : defaultTheme.colors,
+      })
+    }
   }
 
   // Fonction pour gérer le changement de couleur d'accent
   const handleAccentColorChange = (color) => {
     updateAppearanceSetting("accentColor", color)
+    updateThemeProperty("colors.primary", color.color)
   }
 
   // Fonction pour gérer le changement de famille de police
   const handleFontFamilyChange = (e) => {
     const selectedFont = fontFamilies.find((font) => font.value === e.target.value)
     updateAppearanceSetting("fontFamily", selectedFont)
+    updateThemeProperty("fontFamily", selectedFont.value)
   }
 
   // Fonction pour gérer le changement de taille de police
   const handleFontSizeChange = (e) => {
-    updateAppearanceSetting("fontSize", Number.parseInt(e.target.value))
+    const size = Number.parseInt(e.target.value)
+    updateAppearanceSetting("fontSize", size)
+    updateThemeProperty("fontSize", size)
   }
 
   // Fonction pour gérer le changement d'épaisseur de police
   const handleFontWeightChange = (weight) => {
     updateAppearanceSetting("fontWeight", weight)
+    updateThemeProperty("fontWeight", weight)
   }
 
   // Fonction pour gérer le changement de densité de l'interface
   const handleInterfaceDensityChange = (density) => {
     updateAppearanceSetting("interfaceDensity", density)
+    updateThemeProperty("interfaceDensity", density)
   }
 
   // Fonction pour appliquer les changements
   const handleApplyChanges = () => {
-    console.log("Applying appearance changes:", appearanceSettings)
-    // Logique pour appliquer les changements d'apparence
+    // Appliquer tous les changements au thème global
+    const newTheme = {
+      ...theme,
+      name: appearanceSettings.theme === "dark" ? "dark" : "light",
+      colors: {
+        ...theme.colors,
+        primary: appearanceSettings.accentColor.color,
+      },
+      fontFamily: appearanceSettings.fontFamily.value,
+      fontSize: appearanceSettings.fontSize,
+      fontWeight: appearanceSettings.fontWeight,
+      reduceMotion: appearanceSettings.reduceMotion,
+      reduceTransparency: appearanceSettings.reduceTransparency,
+      highContrast: appearanceSettings.highContrast,
+      fontSmoothing: appearanceSettings.fontSmoothing,
+      interfaceDensity: appearanceSettings.interfaceDensity,
+    }
+
+    setTheme(newTheme)
+    showNotification("System", "Appearance settings applied", "success")
   }
 
   // Fonction pour réinitialiser les paramètres
   const handleResetSettings = () => {
-    setAppearanceSettings({
-      theme: "auto",
+    const defaultSettings = {
+      theme: "light",
       accentColor: accentColors[0],
       fontFamily: fontFamilies[0],
       fontSize: 16,
@@ -165,6 +243,19 @@ const AppearanceSettings = ({ settingsState, updateSettings, contentVariants }) 
       highContrast: false,
       fontSmoothing: true,
       interfaceDensity: "comfortable",
+    }
+
+    setAppearanceSettings(defaultSettings)
+
+    // Réinitialiser le thème global
+    setTheme({
+      ...defaultTheme,
+      name: "light",
+      colors: {
+        ...defaultTheme.colors,
+        primary: accentColors[0].color,
+      },
+      fontFamily: fontFamilies[0].value,
     })
   }
 
@@ -404,7 +495,10 @@ const AppearanceSettings = ({ settingsState, updateSettings, contentVariants }) 
                   <span className="text-sm">{texts.fontSmoothing}</span>
                   <ToggleSwitch
                     isEnabled={appearanceSettings.fontSmoothing}
-                    onChange={(value) => updateAppearanceSetting("fontSmoothing", value)}
+                    onChange={(value) => {
+                      updateAppearanceSetting("fontSmoothing", value)
+                      updateThemeProperty("fontSmoothing", value)
+                    }}
                   />
                 </div>
               </div>
@@ -419,21 +513,30 @@ const AppearanceSettings = ({ settingsState, updateSettings, contentVariants }) 
                   <span className="text-sm">{texts.reduceMotion}</span>
                   <ToggleSwitch
                     isEnabled={appearanceSettings.reduceMotion}
-                    onChange={(value) => updateAppearanceSetting("reduceMotion", value)}
+                    onChange={(value) => {
+                      updateAppearanceSetting("reduceMotion", value)
+                      updateThemeProperty("reduceMotion", value)
+                    }}
                   />
                 </div>
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-sm">{texts.reduceTransparency}</span>
                   <ToggleSwitch
                     isEnabled={appearanceSettings.reduceTransparency}
-                    onChange={(value) => updateAppearanceSetting("reduceTransparency", value)}
+                    onChange={(value) => {
+                      updateAppearanceSetting("reduceTransparency", value)
+                      updateThemeProperty("reduceTransparency", value)
+                    }}
                   />
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">{texts.highContrast}</span>
                   <ToggleSwitch
                     isEnabled={appearanceSettings.highContrast}
-                    onChange={(value) => updateAppearanceSetting("highContrast", value)}
+                    onChange={(value) => {
+                      updateAppearanceSetting("highContrast", value)
+                      updateThemeProperty("highContrast", value)
+                    }}
                   />
                 </div>
               </div>
@@ -553,10 +656,8 @@ const AppearanceSettings = ({ settingsState, updateSettings, contentVariants }) 
                   </div>
                 </div>
                 <div className="text-center mt-3">
-                  <h3 className="text-sm font-medium">Personnalisez votre expérience</h3>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Adaptez l'apparence de SKYOS à votre style et à vos préférences.
-                  </p>
+                  <h3 className="text-sm font-medium">{texts.customizeExperience}</h3>
+                  <p className="text-xs text-gray-500 mt-1">{texts.adaptAppearance}</p>
                 </div>
               </div>
             </SectionCard>
