@@ -277,203 +277,240 @@ const TopBar = () => {
           
           {/* Control Center Dropdown */}
           {controlCenterOpen && (
+  <div 
+    className="absolute right-0 ${top}-full mt-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-2xl w-80 p-4 z-50 text-black dark:text-white border border-gray-200/30 dark:border-gray-700/30 overflow-hidden"
+    style={{ backgroundColor: theme.colors.background, color: theme.colors.text }}
+  >
+    {/* Subtle background gradient */}
+    <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50 pointer-events-none" />
+    
+    <div className="relative grid grid-cols-2 gap-3">
+      {/* First row - Connectivity */}
+      <button 
+        onClick={toggleWifi}
+        className={`rounded-xl p-3 flex items-center space-x-3 transition-all duration-300 ${
+          wifiEnabled 
+            ? "bg-blue-50/80 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-700/30" 
+            : "bg-gray-100/80 dark:bg-gray-700/30 border border-gray-200/50 dark:border-gray-600/30"
+        }`}
+      >
+        <div className={`rounded-full p-2 transition-colors ${
+          wifiEnabled ? "bg-blue-500 dark:bg-blue-600" : "bg-gray-400 dark:bg-gray-500"
+        }`}>
+          <FaWifi className="h-4 w-4 text-white" />
+        </div>
+        <div>
+          <div className="font-medium text-sm">Wi-Fi</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {wifiEnabled ? "Connected" : "Off"}
+          </div>
+        </div>
+      </button>
+      
+      <button 
+        onClick={toggleBluetooth}
+        className={`rounded-xl p-3 flex items-center space-x-3 transition-all duration-300 ${
+          bluetoothEnabled 
+            ? "bg-blue-50/80 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-700/30" 
+            : "bg-gray-100/80 dark:bg-gray-700/30 border border-gray-200/50 dark:border-gray-600/30"
+        }`}
+      >
+        <div className={`rounded-full p-2 transition-colors ${
+          bluetoothEnabled ? "bg-blue-500 dark:bg-blue-600" : "bg-gray-400 dark:bg-gray-500"
+        }`}>
+          <FaBluetooth className="h-4 w-4 text-white" />
+        </div>
+        <div>
+          <div className="font-medium text-sm">Bluetooth</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {bluetoothEnabled ? "On" : "Off"}
+          </div>
+        </div>
+      </button>
+      
+      {/* Second row */}
+      <button 
+        onClick={cycleAirDropMode}
+        className="bg-blue-50/80 dark:bg-blue-900/20 rounded-xl p-3 flex items-center space-x-3 border border-blue-200/50 dark:border-blue-700/30 transition-all duration-300"
+      >
+        <div className="bg-blue-500 dark:bg-blue-600 rounded-full p-2">
+          <MdAirplanemodeActive className="h-4 w-4 text-white" />
+        </div>
+        <div>
+          <div className="font-medium text-sm">AirDrop</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">{airDropMode}</div>
+        </div>
+      </button>
+      
+      <div className="bg-gray-100/80 dark:bg-gray-700/30 rounded-xl p-3 flex flex-col border border-gray-200/50 dark:border-gray-600/30">
+        <div className="font-medium text-sm mb-2">Keyboard</div>
+        <div className="flex items-center">
+          <MdKeyboard className="h-4 w-4 mr-3 text-gray-500 dark:text-gray-400" />
+          <div className="relative flex-1 h-2 bg-gray-200/70 dark:bg-gray-600/40 backdrop-blur-sm rounded-full overflow-hidden border border-gray-300/20 dark:border-gray-500/20 shadow-inner">
             <div 
-              className={`absolute right-0 ${top}-full mt-1 bg-gray-200 bg-opacity-80 backdrop-blur-md rounded-lg shadow-xl w-72 p-3 z-50 text-black`}
-              style={{ backgroundColor: theme.colors.background, color: theme.colors.text }}
-            >
-              <div className="grid grid-cols-2 gap-2">
-                {/* First row */}
-                <button 
-                  onClick={toggleWifi}
-                  className={`rounded-lg p-2 flex items-center space-x-2 ${
-                    wifiEnabled ? "bg-blue-100" : "bg-gray-100"
-                  }`}
-                >
-                  <div className={`rounded-full p-1.5 ${
-                    wifiEnabled ? "bg-blue-500" : "bg-gray-400"
-                  }`}>
-                    <FaWifi className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-medium">Wi-Fi</div>
-                    <div className="text-xs text-gray-600">
-                      {wifiEnabled ? "Active" : "Inactive"}
-                    </div>
-                  </div>
-                </button>
-                
-                <button 
-                  onClick={toggleBluetooth}
-                  className={`rounded-lg p-2 flex items-center space-x-2 ${
-                    bluetoothEnabled ? "bg-blue-100" : "bg-gray-100"
-                  }`}
-                >
-                  <div className={`rounded-full p-1.5 ${
-                    bluetoothEnabled ? "bg-blue-500" : "bg-gray-400"
-                  }`}>
-                    <FaBluetooth className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-medium">Bluetooth</div>
-                    <div className="text-xs text-gray-600">
-                      {bluetoothEnabled ? "On" : "Off"}
-                    </div>
-                  </div>
-                </button>
-                
-                {/* Second row */}
-                <button 
-                  onClick={cycleAirDropMode}
-                  className="bg-blue-100 rounded-lg p-2 flex items-center space-x-2"
-                >
-                  <div className="bg-blue-500 rounded-full p-1.5">
-                    <MdAirplanemodeActive className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-medium">AirDrop</div>
-                    <div className="text-xs text-gray-600">{airDropMode}</div>
-                  </div>
-                </button>
-                
-                <div className="bg-gray-100 rounded-lg p-2 flex flex-col">
-                  <div className="font-medium mb-1">Keyboard Brightness</div>
-                  <div className="flex items-center">
-                    <MdKeyboard className="h-4 w-4 mr-2 text-gray-600" />
-                    <div className="h-1.5 flex-1 bg-gray-300 rounded-full">
-                      <div 
-                        className="h-full bg-gray-500 rounded-full" 
-                        style={{ width: `${keyboardBrightness}%` }}
-                      ></div>
-                    </div>
-                    <div className="ml-2 flex space-x-1">
-                      <button 
-                        onClick={() => setKeyboardBrightness(adjustSetting(keyboardBrightness, -10))}
-                        className="text-xs px-1 rounded hover:bg-gray-200"
-                      >
-                        -
-                      </button>
-                      <button 
-                        onClick={() => setKeyboardBrightness(adjustSetting(keyboardBrightness, 10))}
-                        className="text-xs px-1 rounded hover:bg-gray-200"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Third row */}
-                <div className="col-span-2 bg-gray-100 rounded-lg p-2 flex flex-col">
-                  <div className="font-medium mb-1">Display</div>
-                  <div className="flex items-center">
-                    <MdBrightnessMedium className="h-4 w-4 mr-2 text-gray-600" />
-                    <div className="h-1.5 flex-1 bg-gray-300 rounded-full">
-                      <div 
-                        className="h-full bg-gray-500 rounded-full" 
-                        style={{ width: `${displayBrightness}%` }}
-                      ></div>
-                    </div>
-                    <div className="ml-2 flex space-x-1">
-                      <button 
-                        onClick={() => setDisplayBrightness(adjustSetting(displayBrightness, -10))}
-                        className="text-xs px-1 rounded hover:bg-gray-200"
-                      >
-                        -
-                      </button>
-                      <button 
-                        onClick={() => setDisplayBrightness(adjustSetting(displayBrightness, 10))}
-                        className="text-xs px-1 rounded hover:bg-gray-200"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Fourth row */}
-                <div className="col-span-2 bg-gray-100 rounded-lg p-2 flex flex-col">
-                  <div className="font-medium mb-1">Sound</div>
-                  <div className="flex items-center">
-                    <FaVolumeUp className="h-4 w-4 mr-2 text-gray-600" />
-                    <div className="h-1.5 flex-1 bg-gray-300 rounded-full">
-                      <div 
-                        className="h-full bg-gray-500 rounded-full" 
-                        style={{ width: `${soundVolume}%` }}
-                      ></div>
-                    </div>
-                    <div className="ml-2 flex space-x-1">
-                      <button 
-                        onClick={() => setSoundVolume(adjustSetting(soundVolume, -10))}
-                        className="text-xs px-1 rounded hover:bg-gray-200"
-                      >
-                        -
-                      </button>
-                      <button 
-                        onClick={() => setSoundVolume(adjustSetting(soundVolume, 10))}
-                        className="text-xs px-1 rounded hover:bg-gray-200"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Music player */}
-                <div className="col-span-2 bg-gray-100 rounded-lg p-2 flex items-center">
-                  <img 
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-89lZj7CEijR5BgS9iFFmVHJUxEcUKL.png" 
-                    alt="Album cover" 
-                    className="h-12 w-12 rounded object-cover mr-2" 
-                  />
-                  <div className="flex-1">
-                    <div className="font-medium">Alicia Keys</div>
-                    <div className="flex mt-1 space-x-3">
-                      <button 
-                        onClick={() => console.log("Previous track")}
-                        className="hover:text-gray-800"
-                      >
-                        <FaBackward className="h-3 w-3 text-gray-600" />
-                      </button>
-                      <button 
-                        onClick={togglePlayPause}
-                        className="hover:text-gray-800"
-                      >
-                        {isPlaying ? (
-                          <FaPause className="h-3 w-3 text-gray-600" />
-                        ) : (
-                          <FaPlay className="h-3 w-3 text-gray-600" />
-                        )}
-                      </button>
-                      <button 
-                        onClick={() => console.log("Next track")}
-                        className="hover:text-gray-800"
-                      >
-                        <FaForward className="h-3 w-3 text-gray-600" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* AirPlay */}
-                <button 
-                  onClick={toggleAirPlay}
-                  className="col-span-2 bg-gray-100 rounded-lg p-2 flex items-center space-x-2"
-                >
-                  <div className={`rounded-full p-1.5 ${
-                    airPlaySearching ? "bg-blue-500" : "bg-gray-400"
-                  }`}>
-                    <MdCast className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-medium">AirPlay</div>
-                    <div className="text-xs text-gray-600">
-                      {airPlaySearching ? "Looking for displays" : "Connected"}
-                    </div>
-                  </div>
-                </button>
-              </div>
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-gray-400/90 to-gray-500/90 dark:from-gray-400/80 dark:to-gray-500/80 rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${keyboardBrightness}%` }}
+            ></div>
+            <div 
+              className="absolute top-1/2 -translate-y-1/2 h-3 w-3 bg-white dark:bg-gray-200 rounded-full shadow-md border border-gray-200/50 transition-all duration-300 ease-out"
+              style={{ left: `calc(${keyboardBrightness}% - 6px)` }}
+            ></div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Third row - Display */}
+      <div className="col-span-2 bg-gray-100/80 dark:bg-gray-700/30 rounded-xl p-3 flex flex-col border border-gray-200/50 dark:border-gray-600/30">
+        <div className="font-medium text-sm mb-2">Display</div>
+        <div className="flex items-center space-x-3">
+          <MdBrightnessMedium className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+          
+          <div className="relative flex-1 h-6 bg-gray-200/70 dark:bg-gray-600/40 backdrop-blur-sm rounded-full overflow-hidden border border-gray-300/20 dark:border-gray-500/20 shadow-inner">
+            {/* Track fill with gradient */}
+            <div 
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-400/90 to-blue-500/90 dark:from-blue-500/80 dark:to-blue-600/80 rounded-full transition-all duration-300 ease-out shadow-sm"
+              style={{ width: `${displayBrightness}%` }}
+            ></div>
+            
+            {/* Slider knob */}
+            <div 
+              className="absolute top-1/2 -translate-y-1/2 h-5 w-5 bg-white dark:bg-gray-200 rounded-full shadow-md border border-gray-200/50 transition-all duration-300 ease-out"
+              style={{ left: `calc(${displayBrightness}% - 10px)` }}
+            ></div>
+            
+            {/* Subtle tick marks for visual reference */}
+            <div className="absolute inset-0 flex justify-between px-2 pointer-events-none">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-full w-px bg-gray-400/20 dark:bg-gray-500/20"></div>
+              ))}
             </div>
-          )}
+          </div>
+          
+          <div className="flex space-x-2">
+            <button 
+              onClick={() => setDisplayBrightness(adjustSetting(displayBrightness, -10))}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 border border-gray-200/50 dark:border-gray-700/50 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              title="Decrease brightness"
+            >
+              <span className="text-gray-600 dark:text-gray-300">–</span>
+            </button>
+            <button 
+              onClick={() => setDisplayBrightness(adjustSetting(displayBrightness, 10))}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 border border-gray-200/50 dark:border-gray-700/50 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              title="Increase brightness"
+            >
+              <span className="text-gray-600 dark:text-gray-300">+</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Fourth row - Sound */}
+      <div className="col-span-2 bg-gray-100/80 dark:bg-gray-700/30 rounded-xl p-3 flex flex-col border border-gray-200/50 dark:border-gray-600/30">
+        <div className="font-medium text-sm mb-2">Sound</div>
+        <div className="flex items-center space-x-3">
+          <FaVolumeUp className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+          
+          <div className="relative flex-1 h-6 bg-gray-200/70 dark:bg-gray-600/40 backdrop-blur-sm rounded-full overflow-hidden border border-gray-300/20 dark:border-gray-500/20 shadow-inner">
+            {/* Track fill with gradient */}
+            <div 
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-400/90 to-green-500/90 dark:from-green-500/80 dark:to-green-600/80 rounded-full transition-all duration-300 ease-out shadow-sm"
+              style={{ width: `${soundVolume}%` }}
+            ></div>
+            
+            {/* Slider knob */}
+            <div 
+              className="absolute top-1/2 -translate-y-1/2 h-5 w-5 bg-white dark:bg-gray-200 rounded-full shadow-md border border-gray-200/50 transition-all duration-300 ease-out"
+              style={{ left: `calc(${soundVolume}% - 10px)` }}
+            ></div>
+            
+            {/* Subtle tick marks for visual reference */}
+            <div className="absolute inset-0 flex justify-between px-2 pointer-events-none">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-full w-px bg-gray-400/20 dark:bg-gray-500/20"></div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex space-x-2">
+            <button 
+              onClick={() => setSoundVolume(adjustSetting(soundVolume, -10))}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 border border-gray-200/50 dark:border-gray-700/50 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              title="Decrease volume"
+            >
+              <span className="text-gray-600 dark:text-gray-300">–</span>
+            </button>
+            <button 
+              onClick={() => setSoundVolume(adjustSetting(soundVolume, 10))}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-white/80 dark:bg-gray-800/80 border border-gray-200/50 dark:border-gray-700/50 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              title="Increase volume"
+            >
+              <span className="text-gray-600 dark:text-gray-300">+</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Music player */}
+      <div className="col-span-2 bg-gray-100/80 dark:bg-gray-700/30 rounded-xl p-3 flex items-center border border-gray-200/50 dark:border-gray-600/30 overflow-hidden relative group">
+        {/* Background hover effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        
+        <img 
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-89lZj7CEijR5BgS9iFFmVHJUxEcUKL.png" 
+          alt="Album cover" 
+          className="h-14 w-14 rounded-lg object-cover mr-3 shadow-md transition-transform duration-300 group-hover:scale-105" 
+        />
+        <div className="flex-1">
+          <div className="font-medium text-sm">Alicia Keys</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">No One</div>
+          <div className="mt-2 flex items-center space-x-4">
+            <button 
+              onClick={() => console.log("Previous track")}
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+            >
+              <FaBackward className="h-3.5 w-3.5" />
+            </button>
+            <button 
+              onClick={togglePlayPause}
+              className="w-8 h-8 rounded-full bg-white/80 dark:bg-gray-800/80 flex items-center justify-center shadow-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              {isPlaying ? (
+                <FaPause className="h-3.5 w-3.5 text-gray-700 dark:text-gray-300" />
+              ) : (
+                <FaPlay className="h-3.5 w-3.5 text-gray-700 dark:text-gray-300 ml-0.5" />
+              )}
+            </button>
+            <button 
+              onClick={() => console.log("Next track")}
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+            >
+              <FaForward className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* AirPlay */}
+      <button 
+        onClick={toggleAirPlay}
+        className="col-span-2 bg-gray-100/80 dark:bg-gray-700/30 rounded-xl p-3 flex items-center space-x-3 border border-gray-200/50 dark:border-gray-600/30 transition-all duration-300 hover:bg-gray-200/50 dark:hover:bg-gray-600/30"
+      >
+        <div className={`rounded-full p-2 transition-colors ${
+          airPlaySearching ? "bg-blue-500 dark:bg-blue-600" : "bg-gray-400 dark:bg-gray-500"
+        }`}>
+          <MdCast className="h-4 w-4 text-white" />
+        </div>
+        <div>
+          <div className="font-medium text-sm">AirPlay</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {airPlaySearching ? "Looking for displays..." : "Ready to connect"}
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+)}
         </div>
 
         {/* Date and time */}
