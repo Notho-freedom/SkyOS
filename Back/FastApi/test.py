@@ -33,7 +33,6 @@ def test_tts():
     
     # Essayons plusieurs voix françaises disponibles
     voices_to_try = [
-        "fr-FR-HenriNeural",  # Voix masculine française
         "fr-FR-DeniseNeural", # Voix féminine française  
         "fr-CA-SylvieNeural", # Voix canadienne française
         "fr-FR-BrigitteNeural" # Autre voix française
@@ -59,7 +58,6 @@ def test_tts():
                 pygame.time.Clock().tick(10)
                 
             print("✅ Audio terminé")
-            break  # Sortir après le premier succès
         else:
             print(f"❌ Erreur avec {voice}: {response.status_code}, {response.text}")
     else:
@@ -181,8 +179,8 @@ def simple_tts_test():
 def run_tests():
     print("=== TEST DE LA SYNTHÈSE VOCALE ===")
     test_status()
-    simple_tts_test()  # Test simple d'abord
-    #test_tts()  # Test avec la voix française sélectionnée
+    #simple_tts_test()  # Test simple d'abord
+    test_tts()  # Test avec la voix française sélectionnée
     #test_voices()
     #test_check_voice()
     #test_voices_by_text()
