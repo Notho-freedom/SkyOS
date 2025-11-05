@@ -79,10 +79,20 @@ async def check_voice(voice_name: str):
     """Vérifie si une voix spécifique est disponible."""
     try:
         voices = await edge_tts.list_voices()
-        voice_available = any(voice['Name'] == voice_name for voice in voices)
+        # Vérifier avec ShortName ET Name pour plus de compatibilité
+        voice_available = any(
+            voice.get('ShortName') == voice_name or 
+            voice.get('Name') == voice_name or
+            voice_name in voice.get('Name', '') 
+            for voice in voices
+        )
         if voice_available:
             return JSONResponse(content={"voice": voice_name, "available": True})
         else:
+            # Debug: loggons les premières voix disponibles
+            logger.info(f"Voice {voice_name} not found. First 3 available voices:")
+            for i, voice in enumerate(voices[:3]):
+                logger.info(f"  {i+1}. Name: {voice.get('Name')}, ShortName: {voice.get('ShortName')}")
             return JSONResponse(content={"voice": voice_name, "available": False})
     except Exception as e:
         logger.error(f"Error checking voice {voice_name}: {e}")
