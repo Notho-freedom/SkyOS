@@ -4,7 +4,7 @@ import io
 import json
 
 # URL de ton serveur FastAPI (change en fonction de ton adresse)
-base_url = "https://low-tts.onrender.com"  # Changez cette ligne si nécessaire
+base_url = "https://low-tts.onrender.com"  # Serveur distant
 
 # 1. Test de la route /api/status
 def test_status():
@@ -57,7 +57,7 @@ def test_check_voice():
 def test_voices_by_text():
     text = "Je voudrais savoir quelles voix sont disponibles."
     payload = {"text": text}
-    response = requests.get(f"{base_url}/api/voices-by-text", json=payload)
+    response = requests.post(f"{base_url}/api/voices-by-text", json=payload)
 
     if response.status_code == 200:
         print(f"Voix disponibles pour le texte '{text[:30]}...': ", response.json())
@@ -77,10 +77,10 @@ def test_voices_by_language():
 # Exécution de tous les tests
 def run_tests():
     #test_status()
-    #test_tts()
+    test_tts()  # Commenté pour éviter de jouer de l'audio pendant les tests
     #test_voices()
     #test_check_voice()
-    test_voices_by_text()
+    #test_voices_by_text()
     #test_voices_by_language()
 
 if __name__ == "__main__":
