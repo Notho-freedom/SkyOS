@@ -22,35 +22,126 @@ app.add_middleware(
     allow_headers=["*"],  # Permet tous les en-têtes
 )
 
+async def find_fallback_voice(original_voice: str, voices_list: list):
+    """Trouve une voix de fallback du même genre et de la même langue."""
+    try:
+        # Extraire les informations de la voix originale
+        original_voice_info = None
+        for voice in voices_list:
+            if voice.get('ShortName') == original_voice or voice.get('Name') == original_voice:
+                original_voice_info = voice
+                break
+        
+        if not original_voice_info:
+            # Si on ne trouve pas la voix originale, utiliser une voix française féminine par défaut
+            for voice in voices_list:
+                if voice.get('Locale', '').startswith('fr') and voice.get('Gender') == 'Female':
+                    logger.info(f"Fallback to default French female voice: {voice.get('ShortName')}")
+                    return voice.get('ShortName')
+            return "fr-FR-DeniseNeural"  # Fallback ultime
+        
+        # Chercher des voix du même genre et de la même langue
+        target_locale = original_voice_info.get('Locale', '')
+        target_gender = original_voice_info.get('Gender', '')
+        target_language = target_locale.split('-')[0] if target_locale else 'fr'
+        
+        # Chercher des alternatives dans le même locale d'abord
+        same_locale_voices = [
+            voice for voice in voices_list 
+            if (voice.get('Locale') == target_locale and 
+                voice.get('Gender') == target_gender and 
+                voice.get('ShortName') != original_voice)
+        ]
+        
+        if same_locale_voices:
+            fallback = same_locale_voices[0].get('ShortName')
+            logger.info(f"Found same locale fallback: {fallback}")
+            return fallback
+        
+        # Sinon, chercher dans la même langue
+        same_language_voices = [
+            voice for voice in voices_list 
+            if (voice.get('Locale', '').startswith(target_language) and 
+                voice.get('Gender') == target_gender and 
+                voice.get('ShortName') != original_voice)
+        ]
+        
+        if same_language_voices:
+            fallback = same_language_voices[0].get('ShortName')
+            logger.info(f"Found same language fallback: {fallback}")
+            return fallback
+        
+        # Dernier recours : n'importe quelle voix du même genre
+        same_gender_voices = [
+            voice for voice in voices_list 
+            if (voice.get('Gender') == target_gender and 
+                voice.get('ShortName') != original_voice)
+        ]
+        
+        if same_gender_voices:
+            fallback = same_gender_voices[0].get('ShortName')
+            logger.info(f"Found same gender fallback: {fallback}")
+            return fallback
+        
+        return "fr-FR-DeniseNeural"  # Fallback ultime
+        
+    except Exception as e:
+        logger.error(f"Error finding fallback voice: {e}")
+        return "fr-FR-DeniseNeural"
+
+
 @app.post("/api/tts")
 async def generate_tts(request: Request):
     try:
         data = await request.json()
         text = data.get("text", "")
         voice = data.get("voice", "fr-FR-DeniseNeural")  # Voix par défaut
-
+        max_retries = 3  # Nombre maximum de tentatives
+        
         logger.info(f"TTS Request: '{text[:30]}...' with voice '{voice}'")
+        
+        # Récupérer la liste des voix disponibles
+        voices_list = await edge_tts.list_voices()
+        
+        current_voice = voice  # Initialiser current_voice
+        
+        for attempt in range(max_retries):
+            try:
+                current_voice = voice if attempt == 0 else await find_fallback_voice(voice, voices_list)
+                logger.info(f"Attempt {attempt + 1}: Using voice '{current_voice}'")
+                
+                # Setup edge-tts
+                communicate = edge_tts.Communicate(text, current_voice)
+                audio_buffer = BytesIO()
 
-        # Setup edge-tts
-        communicate = edge_tts.Communicate(text, voice)
-        audio_buffer = BytesIO()
+                async for chunk in communicate.stream():
+                    if chunk.get("type") == "audio" and "data" in chunk:
+                        audio_buffer.write(chunk["data"])
 
-        async for chunk in communicate.stream():
-            if chunk["type"] == "audio":
-                audio_buffer.write(chunk["data"])
+                audio_buffer.seek(0)
+                
+                # Si on arrive ici, c'est que ça a marché
+                if attempt > 0:
+                    logger.info(f"TTS succeeded with fallback voice '{current_voice}' after {attempt + 1} attempts")
+                
+                return StreamingResponse(
+                    content=audio_buffer,
+                    media_type="audio/mpeg",
+                    headers={"X-Used-Voice": current_voice}  # Indiquer quelle voix a été utilisée
+                )
 
-        audio_buffer.seek(0)
-
-        return StreamingResponse(
-            content=audio_buffer,
-            media_type="audio/mpeg"
-        )
+            except Exception as voice_error:
+                logger.warning(f"Attempt {attempt + 1} failed with voice '{current_voice}': {voice_error}")
+                if attempt == max_retries - 1:
+                    # Dernière tentative échouée
+                    raise voice_error
+                # Continuer avec la prochaine tentative
 
     except Exception as e:
-        logger.error(f"TTS Error: {e}")
+        logger.error(f"TTS Error after all attempts: {e}")
         return JSONResponse(
             status_code=500,
-            content={"error": "Erreur lors de la génération TTS"}
+            content={"error": "Erreur lors de la génération TTS après toutes les tentatives"}
         )
 
 
