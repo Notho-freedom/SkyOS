@@ -1,5 +1,10 @@
 # SkyOS
 
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?logo=javascript&logoColor=111111)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=111111)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Cloud-first operating system built with JavaScript, featuring a modern web-based interface and cloud integration.
 
 ## 🚀 Features
@@ -29,7 +34,7 @@ SkyOS/
 
 ## 🚀 Installation
 
-`ash
+`\bash
 git clone https://github.com/Notho-freedom/SkyOS.git
 cd SkyOS
 npm install
@@ -37,7 +42,7 @@ npm install
 
 ## 🏃 Running
 
-`ash
+`\bash
 npm start
 `
 
